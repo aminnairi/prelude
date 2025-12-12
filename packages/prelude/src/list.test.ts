@@ -60,7 +60,11 @@ test("count", () => {
 });
 
 test("update", () => {
-  const result = list.of(1, 2, 3).updateAll(value => value * 2).value();
+  const result = chain
+    .of(list.of(1, 2, 3))
+    .and(list.update(value => value * 2))
+    .value()
+    .value();
 
   expect(result).toStrictEqual([2, 4, 6]);
 });
@@ -98,8 +102,17 @@ test("position", () => {
 });
 
 test("updateAt", () => {
-  const resultWithUpdate = list.of(1, 2, 3).updateAt(1, value => value * 2).value();
-  const resultWithoutUpdate = list.of(1, 2, 3).updateAt(5, value => value * 2).value();
+  const resultWithUpdate = chain
+    .of(list.of(1, 2, 3))
+    .and(list.updateAt(1, value => value * 2))
+    .value()
+    .value();
+
+  const resultWithoutUpdate = chain
+    .of(list.of(1, 2, 3))
+    .and(list.updateAt(5, value => value * 2))
+    .value()
+    .value();
 
   expect(resultWithUpdate).toStrictEqual([1, 4, 3]);
   expect(resultWithoutUpdate).toStrictEqual([1, 2, 3]);
@@ -123,8 +136,6 @@ test("removeAt", () => {
 
 test("enumerate", () => {
   const result = list.of(1, 2, 3).enumerate().value();
-
-  list.of(1, 2, 3).enumerate().updateAll(([index, value]) => index * value);
 
   expect(result).toStrictEqual([[0, 1], [1, 2], [2, 3]]);
 });

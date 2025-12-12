@@ -2,8 +2,6 @@ import { none, some, type Maybe } from "./maybe";
 import * as text from "./text";
 
 interface List<Value> {
-  updateAll: <NewValue>(update: (value: Value) => NewValue) => List<NewValue>;
-  updateAt: (index: number, update: (value: Value) => Value) => List<Value>;
   first: () => Maybe<Value>;
   last: () => Maybe<Value>;
   at: (index: number) => Maybe<Value>;
@@ -61,18 +59,6 @@ export const of = <Value = never>(...values: Value[]): List<Value> => {
       }
 
       return some(result);
-    },
-    updateAll: (update) => {
-      return of(...values.map(value => update(value)));
-    },
-    updateAt: (index, update) => {
-      return of(...values.map((value, currentIndex) => {
-        if (currentIndex !== index) {
-          return value;
-        }
-
-        return update(value);
-      }));
     },
     count: () => {
       return values.length;
@@ -221,6 +207,26 @@ export const removeAt = <Value>(index: number) => {
   return (list: List<Value>) => {
     return of(...list.value().filter((_, currentIndex) => {
       return index !== currentIndex;
+    }));
+  };
+};
+
+
+export const update = <Value, NewValue>(transform: (value: Value) => NewValue) => {
+  return (list: List<Value>) => {
+    return of(...list.value().map(value => transform(value)));
+  };
+};
+
+
+export const updateAt = <Value>(index: number, update: (value: Value) => Value) => {
+  return (list: List<Value>) => {
+    return of(...list.value().map((value, currentIndex) => {
+      if (currentIndex !== index) {
+        return value;
+      }
+
+      return update(value);
     }));
   };
 };
