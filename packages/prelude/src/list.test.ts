@@ -44,9 +44,13 @@ test("keep", () => {
 });
 
 test("remove", () => {
-  const result = list.of(1, 2, 3, 4, 5).remove(value => value % 2 !== 0);
+  const result = chain
+    .of(list.of(1, 2, 3, 4, 5))
+    .and(list.remove(value => value % 2 !== 0))
+    .value()
+    .value();
 
-  expect(result.value()).toStrictEqual([2, 4]);
+  expect(result).toStrictEqual([2, 4]);
 });
 
 test("count", () => {
@@ -108,7 +112,11 @@ test("append", () => {
 });
 
 test("removeAt", () => {
-  const result = list.of(1, 2, 3).removeAt(2).value();
+  const result = chain
+    .of(list.of(1, 2, 3))
+    .and(list.removeAt(2))
+    .value()
+    .value();
 
   expect(result).toStrictEqual([1, 2]);
 });

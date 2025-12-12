@@ -2,8 +2,6 @@ import { none, some, type Maybe } from "./maybe";
 import * as text from "./text";
 
 interface List<Value> {
-  remove: (when: (value: Value) => boolean) => List<Value>;
-  removeAt: (index: number) => List<Value>;
   updateAll: <NewValue>(update: (value: Value) => NewValue) => List<NewValue>;
   updateAt: (index: number, update: (value: Value) => Value) => List<Value>;
   first: () => Maybe<Value>;
@@ -41,16 +39,6 @@ export const of = <Value = never>(...values: Value[]): List<Value> => {
       return values.every(value => {
         return when(value);
       })
-    },
-    remove: (when: (value: Value) => boolean) => {
-      return of(...values.filter(value => {
-        return !when(value);
-      }));
-    },
-    removeAt: (index) => {
-      return of(...values.filter((_, currentIndex) => {
-        return index !== currentIndex;
-      }));
     },
     find: (when) => {
       const value = values.find(value => {
@@ -214,9 +202,25 @@ export const keep = <Value>(when: (value: Value) => boolean) => {
   };
 };
 
-
 export const join = <Value>(separator: text.Text) => {
   return (list: List<Value>) => {
     return text.of(list.value().join(separator.value()));
+  };
+};
+
+export const remove = <Value>(when: (value: Value) => boolean) => {
+  return (list: List<Value>) => {
+    return of(...list.value().filter(value => {
+      return !when(value);
+    }));
+  };
+};
+
+
+export const removeAt = <Value>(index: number) => {
+  return (list: List<Value>) => {
+    return of(...list.value().filter((_, currentIndex) => {
+      return index !== currentIndex;
+    }));
   };
 };
