@@ -7,4 +7,4 @@ Type-safe standard library for TypeScript
 | Package                                     | Description                           |
 | ------------------------------------------- | ------------------------------------- |
 | [`@aminnairi/prelude`](./packages/prelude/) | Main package                          |
-| `example`                                   | Example usage of `@aminnairi/prelude` |
+| [`example`](./example/)                     | Example usage of `@aminnairi/prelude` |
