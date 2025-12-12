@@ -1,8 +1,9 @@
-import * as list from "@aminnairi/prelude/list";
+import { list, chain } from "@aminnairi/prelude";
 
-const result = list
-  .of(1, 2, 3)
-  .at(5)
-  .or(-1);
+const result = chain
+  .of(list.of(1, 2, 3))
+  .and(list.keep(value => value < 3))
+  .value()
+  .value();
 
 console.log(result);
