@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
+  }
+}
