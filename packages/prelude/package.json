@@ -2,6 +2,7 @@
   "private": true,
   "name": "@aminnairi/prelude",
   "scripts": {
+    "lint": "tsc --noEmit",
     "test": "vitest run --coverage"
   },
   "devDependencies": {
