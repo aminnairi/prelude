@@ -64,7 +64,7 @@ describe("future", () => {
       .of(future.of<number, never>((succeed) => {
         succeed(123);
       }))
-      .and(future.update(value => value * 2))
+      .next(future.update(value => value * 2))
       .value()
       .when(
         value => {
@@ -79,7 +79,7 @@ describe("future", () => {
       .of(future.of<number, never>(() => {
         throw new Error("Error");
       }))
-      .and(future.update(value => value * 2))
+      .next(future.update(value => value * 2))
       .value()
       .when(
         value => {
@@ -94,7 +94,7 @@ describe("future", () => {
   test("upgrade", () => {
     stream
       .of(future.of<number>((succeed) => succeed(123)))
-      .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
+      .next(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
       .value()
       .when(
         value => {
@@ -109,7 +109,7 @@ describe("future", () => {
       .of(future.of<number>(() => {
         throw new Error("Error");
       }))
-      .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
+      .next(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
       .value()
       .when(
         value => {
@@ -122,7 +122,7 @@ describe("future", () => {
 
     stream
       .of(future.of<number>((succeed) => succeed(123)))
-      .and(future.upgrade(() => future.of<number>(() => {
+      .next(future.upgrade(() => future.of<number>(() => {
         throw new Error("Error");
       })))
       .value()

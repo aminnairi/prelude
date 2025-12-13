@@ -15,7 +15,7 @@ describe("text", () => {
   test("count", () => {
     const result = stream
       .of(text.of("Hello"))
-      .and(text.count())
+      .next(text.count())
       .value();
 
     expect(result).toBe(5);
@@ -24,7 +24,7 @@ describe("text", () => {
   test("concatenate", () => {
     const result = stream
       .of(text.of("Hello, "))
-      .and(text.concatenate(text.of("world!")))
+      .next(text.concatenate(text.of("world!")))
       .value()
       .value();
 
@@ -34,7 +34,7 @@ describe("text", () => {
   test("updateAll", () => {
     const result = stream
       .of(text.of("hello"))
-      .and(text.updateAll(character => text.of(character.value().toUpperCase())))
+      .next(text.updateAll(character => text.of(character.value().toUpperCase())))
       .value()
       .value();
 
@@ -44,7 +44,7 @@ describe("text", () => {
   test("updateAt", () => {
     const result = stream
       .of(text.of("hello"))
-      .and(text.updateAt(1, character => text.of(character.value().toUpperCase())))
+      .next(text.updateAt(1, character => text.of(character.value().toUpperCase())))
       .value()
       .value();
 

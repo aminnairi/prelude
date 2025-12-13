@@ -1,11 +1,11 @@
 export interface Chain<Value> {
-  and: <NewValue>(update: (value: Value) => NewValue) => Chain<NewValue>
+  next: <NewValue>(update: (value: Value) => NewValue) => Chain<NewValue>
   value: () => Value;
 }
 
 export const of = <Value>(value: Value): Chain<Value> => {
   return {
-    and: (update) => {
+    next: (update) => {
       return of(update(value));
     },
     value: () => {
