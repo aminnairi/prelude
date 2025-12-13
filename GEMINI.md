@@ -59,3 +59,7 @@ npm -w packages/prelude test
 ```
 
 In case something is wrong, you should fix and run again these commands until the issue is resolved.
+
+## Tests
+
+Tests coverage for the project should always reach 100%, each modification that decrease its value must include tests so that it goes back to 100% always.
