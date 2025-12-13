@@ -18,6 +18,10 @@ Whenever the user wants you to document the code, you'll write for the prelude p
 
 A good documentation for any exposed function looks like that.
 
+All documented module's examples should use the `chain` module whenever possible to ease the reading and writing of code and to give inspiration on how to write good and streamlined code.
+
+When importing things inside code blocks for documentation purpose, never import sub-files, always stick to the root package `@aminnairi/prelude`, never some module directly like `@aminnairi/prelude/maybe`. Everything should be exported from the `packages/prelude/index.ts` and if this is not the case, export the relevant module in here.
+
 ```markdown
 ## API
 
