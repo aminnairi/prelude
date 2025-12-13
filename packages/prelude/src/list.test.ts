@@ -354,3 +354,12 @@ test("zip", () => {
   expect(result).toStrictEqual([[1, 2], [3, 4], [5, 6]]);
   expect(emptyListResult).toStrictEqual([]);
 });
+
+test("upgrade", () => {
+  const value = chain
+    .of(list.of(1, 2, 3, 4, 5))
+    .and(list.upgrade(0, (total, value) => total + value))
+    .value();
+
+  expect(value).toStrictEqual(15);
+});
