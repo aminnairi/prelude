@@ -3,12 +3,32 @@ import * as text from "./text";
 import * as chain from "./chain";
 
 describe("text", () => {
-  test("value", () => {
+  test("from", () => {
+    const num = 123;
+    const bool = true;
+    const obj = { a: 1 };
+
+    expect(chain.of(num).and(text.from).value()).toStrictEqual("123");
+    expect(chain.of(bool).and(text.from).value()).toStrictEqual("true");
+    expect(chain.of(obj).and(text.from).value()).toStrictEqual("[object Object]");
+  });
+
+  test("prefix", () => {
     const result = chain
-      .of("Hello")
+      .of("world")
+      .and(text.prefix("Hello, "))
       .value();
 
-    expect(result).toStrictEqual("Hello");
+    expect(result).toStrictEqual("Hello, world");
+  });
+
+  test("suffix", () => {
+    const result = chain
+      .of("Hello")
+      .and(text.suffix(" World!"))
+      .value();
+
+    expect(result).toStrictEqual("Hello World!");
   });
 
   test("count", () => {

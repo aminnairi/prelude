@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import * as future from "./future";
 import * as chain from "./chain";
 
@@ -24,18 +24,31 @@ describe("future", () => {
     );
   });
 
-  test("when", () => {
-    future.of<number, never>((succeed) => {
-      succeed(123);
-    }).when(
-      value => {
-        expect(value).toStrictEqual(123);
-      },
-      issue => {
-        expect.fail(issue.message);
-      }
-    );
+  test("exported when with success", () => {
+    const successSpy = vi.fn();
+    const failureSpy = vi.fn();
+
+    chain.of(future.succeed(123))
+      .and(future.when(successSpy, failureSpy))
+      .value();
+
+    expect(successSpy).toHaveBeenCalledWith(123);
+    expect(failureSpy).not.toHaveBeenCalled();
   });
+
+  test("exported when with failure", () => {
+    const successSpy = vi.fn();
+    const failureSpy = vi.fn();
+    const testError = "Something went wrong";
+
+    chain.of(future.fail(testError))
+      .and(future.when(successSpy, failureSpy))
+      .value();
+
+    expect(successSpy).not.toHaveBeenCalled();
+    expect(failureSpy).toHaveBeenCalledWith(testError);
+  });
+
 
   test("succeed", () => {
     future.succeed(123).when(
