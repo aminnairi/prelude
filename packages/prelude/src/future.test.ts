@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import * as future from "./future";
-import * as chain from "./chain";
+import * as stream from "./stream";
 
 describe("future", () => {
   test("UnexpectedIssue", () => {
@@ -60,7 +60,7 @@ describe("future", () => {
   });
 
   test("update", () => {
-    chain
+    stream
       .of(future.of<number, never>((succeed) => {
         succeed(123);
       }))
@@ -75,7 +75,7 @@ describe("future", () => {
         }
       );
 
-    chain
+    stream
       .of(future.of<number, never>(() => {
         throw new Error("Error");
       }))
@@ -92,7 +92,7 @@ describe("future", () => {
   });
 
   test("upgrade", () => {
-    chain
+    stream
       .of(future.of<number>((succeed) => succeed(123)))
       .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
       .value()
@@ -105,7 +105,7 @@ describe("future", () => {
         }
       );
 
-    chain
+    stream
       .of(future.of<number>(() => {
         throw new Error("Error");
       }))
@@ -120,7 +120,7 @@ describe("future", () => {
         }
       );
 
-    chain
+    stream
       .of(future.of<number>((succeed) => succeed(123)))
       .and(future.upgrade(() => future.of<number>(() => {
         throw new Error("Error");

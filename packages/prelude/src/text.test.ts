@@ -1,10 +1,10 @@
 import { describe, test, expect } from "vitest";
 import * as text from "./text";
-import * as chain from "./chain";
+import * as stream from "./stream";
 
 describe("text", () => {
   test("value", () => {
-    const result = chain
+    const result = stream
       .of(text.of("Hello"))
       .value()
       .value();
@@ -13,7 +13,7 @@ describe("text", () => {
   });
 
   test("count", () => {
-    const result = chain
+    const result = stream
       .of(text.of("Hello"))
       .and(text.count())
       .value();
@@ -22,7 +22,7 @@ describe("text", () => {
   });
 
   test("concatenate", () => {
-    const result = chain
+    const result = stream
       .of(text.of("Hello, "))
       .and(text.concatenate(text.of("world!")))
       .value()
@@ -32,7 +32,7 @@ describe("text", () => {
   });
 
   test("updateAll", () => {
-    const result = chain
+    const result = stream
       .of(text.of("hello"))
       .and(text.updateAll(character => text.of(character.value().toUpperCase())))
       .value()
@@ -42,7 +42,7 @@ describe("text", () => {
   });
 
   test("updateAt", () => {
-    const result = chain
+    const result = stream
       .of(text.of("hello"))
       .and(text.updateAt(1, character => text.of(character.value().toUpperCase())))
       .value()
