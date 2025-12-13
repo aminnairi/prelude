@@ -133,6 +133,20 @@ console.log(result);
 // => 25
 ```
 
+##### Example with Chain unwrapping
+
+```typescript
+import { chain } from "@aminnairi/prelude";
+
+const result = chain.of(10)
+  .and(value => chain.of(value + 1)) // An intermediate function returning a Chain
+  .and(value => value * 2)
+  .value();
+
+console.log(result);
+// => 22 ( (10 + 1) * 2 )
+```
+
 ### text
 
 The `text` module provides functions for immutable string manipulation using a functional approach.
@@ -1250,12 +1264,12 @@ console.log(isDivisible);
 
 #### add
 
-Adds two numbers.
+Adds one or more numbers to an initial number.
 
 ##### Signature
 
 ```typescript
-function add(second: number): (first: number) => number
+function add(...seconds: number[]): (first: number) => number
 ```
 
 ##### Example
@@ -1269,6 +1283,19 @@ const sum = chain.of(5)
 
 console.log(sum);
 // => 8
+```
+
+##### Example with multiple numbers
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const total = chain.of(10)
+  .and(numeric.add(1, 2, 3)) // Adds 1, 2, and 3 to 10
+  .value();
+
+console.log(total);
+// => 16
 ```
 
 #### subtract
