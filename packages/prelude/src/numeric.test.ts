@@ -133,6 +133,15 @@ describe("numeric", () => {
     expect(value).toStrictEqual(246);
   });
 
+  test("add variadic", () => {
+    const value = chain
+      .of(10)
+      .and(numeric.add(1, 2, 3))
+      .value();
+
+    expect(value).toStrictEqual(16);
+  });
+
   test("subtract", () => {
     const value = chain
       .of(123)
