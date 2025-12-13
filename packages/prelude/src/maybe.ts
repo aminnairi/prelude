@@ -18,3 +18,9 @@ export function none<Value>(): Maybe<Value> {
     or: fallback => fallback,
   };
 };
+
+export const or = <Value>(value: Value) => {
+  return (maybe: Maybe<Value>) => {
+    return maybe.or(value);
+  };
+};
