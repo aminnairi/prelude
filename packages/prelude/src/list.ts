@@ -1,7 +1,7 @@
 import * as maybe from "./maybe";
 import * as text from "./text";
 
-interface List<Value> {
+export interface List<Value> {
   value: () => Array<Value>;
 }
 
@@ -271,3 +271,11 @@ export const zip = <Value, OtherValue>(other: List<OtherValue>) => {
     return of(...result);
   };
 }
+
+export const upgrade = <Value, NewValue>(value: NewValue, reducer: (previous: NewValue, current: Value) => NewValue) => {
+  return (list: List<Value>) => {
+    return list.value().reduce((previous, current) => {
+      return reducer(previous, current);
+    }, value);
+  };
+};
