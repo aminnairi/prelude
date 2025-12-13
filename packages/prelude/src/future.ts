@@ -70,3 +70,10 @@ export const upgrade = <Value, Issue, NewValue, NewIssue>(update: (value: Value)
     });
   };
 };
+
+export const when = <Value, Issue>(success: (value: Value) => void, failure: (issue: Issue | UnexpectedIssue) => void) => {
+  return (future: Future<Value, Issue>) => {
+    future.when(success, failure);
+    return future;
+  };
+};
