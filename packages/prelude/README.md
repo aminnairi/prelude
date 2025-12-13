@@ -14,7 +14,7 @@ npm i @aminnairi/prelude
 import { chain, list } from "@aminnairi/prelude";
 
 chain
-  .of(list.of(1, 2, 3))
+  .of([1, 2, 3])
   .and(list.keep((value) => value < 3))
   .and(list.each(console.log));
 ```
@@ -137,40 +137,14 @@ console.log(result);
 
 The `text` module provides functions for immutable string manipulation using a functional approach.
 
-#### of
-
-Creates a `Text` instance from a string.
-
-##### Signature
-
-```typescript
-function of(text: string): Text
-```
-
-##### Example
-
-```typescript
-import { chain, text } from "@aminnairi/prelude";
-
-const myText = text.of("Hello");
-console.log(myText.value());
-// => "Hello"
-
-const chainedText = chain.of("World")
-  .and(text.of)
-  .value();
-console.log(chainedText.value());
-// => "World"
-```
-
 #### count
 
-Returns the number of characters in a `Text` instance.
+Returns the number of characters in a string.
 
 ##### Signature
 
 ```typescript
-function count(): (text: Text) => number
+function count(): (text: string) => number
 ```
 
 ##### Example
@@ -179,7 +153,6 @@ function count(): (text: Text) => number
 import { chain, text } from "@aminnairi/prelude";
 
 const textLength = chain.of("Hello World")
-  .and(text.of)
   .and(text.count())
   .value();
 
@@ -189,12 +162,12 @@ console.log(textLength);
 
 #### concatenate
 
-Concatenates a `suffix` Text instance to the current `Text` instance.
+Concatenates a `suffix` string to the current string.
 
 ##### Signature
 
 ```typescript
-function concatenate(suffix: Text): (text: Text) => Text
+function concatenate(suffix: string): (text: string) => string
 ```
 
 ##### Example
@@ -203,22 +176,21 @@ function concatenate(suffix: Text): (text: Text) => Text
 import { chain, text } from "@aminnairi/prelude";
 
 const greeting = chain.of("Hello")
-  .and(text.of)
-  .and(text.concatenate(text.of(" World")))
+  .and(text.concatenate(" World"))
   .value();
 
-console.log(greeting.value());
+console.log(greeting);
 // => "Hello World"
 ```
 
 #### updateAll
 
-Applies an `update` function to each character of a `Text` instance.
+Applies an `update` function to each character of a string.
 
 ##### Signature
 
 ```typescript
-function updateAll(update: (character: Text) => Text): (text: Text) => Text
+function updateAll(update: (character: string) => string): (text: string) => string
 ```
 
 ##### Example
@@ -227,22 +199,21 @@ function updateAll(update: (character: Text) => Text): (text: Text) => Text
 import { chain, text } from "@aminnairi/prelude";
 
 const capitalized = chain.of("hello")
-  .and(text.of)
-  .and(text.updateAll(char => text.of(char.value().toUpperCase())))
+  .and(text.updateAll(char => char.toUpperCase()))
   .value();
 
-console.log(capitalized.value());
+console.log(capitalized);
 // => "HELLO"
 ```
 
 #### updateAt
 
-Applies an `update` function to the character at a specific `index` of a `Text` instance.
+Applies an `update` function to the character at a specific `index` of a string.
 
 ##### Signature
 
 ```typescript
-function updateAt(index: number, update: (character: Text) => Text): (text: Text) => Text
+function updateAt(index: number, update: (character: string) => string): (text: string) => string
 ```
 
 ##### Example
@@ -251,11 +222,10 @@ function updateAt(index: number, update: (character: Text) => Text): (text: Text
 import { chain, text } from "@aminnairi/prelude";
 
 const modifiedText = chain.of("Hello")
-  .and(text.of)
-  .and(text.updateAt(0, char => text.of(char.value().toLowerCase())))
+  .and(text.updateAt(0, char => char.toLowerCase()))
   .value();
 
-console.log(modifiedText.value());
+console.log(modifiedText);
 // => "hello"
 ```
 
@@ -263,40 +233,14 @@ console.log(modifiedText.value());
 
 The `list` module provides functions for working with immutable lists, offering a functional approach to common array operations.
 
-#### of
-
-Creates a `List` instance from a sequence of values.
-
-##### Signature
-
-```typescript
-function of<Value = never>(...values: Value[]): List<Value>
-```
-
-##### Example
-
-```typescript
-import { chain, list } from "@aminnairi/prelude";
-
-const myList = list.of(1, 2, 3);
-console.log(myList.value());
-// => [1, 2, 3]
-
-const chainedList = chain.of(["a", "b"])
-  .and(values => list.of(...values))
-  .value();
-console.log(chainedList.value());
-// => ["a", "b"]
-```
-
 #### keep
 
-Returns a new `List` containing only the elements for which the `when` predicate returns `true`.
+Returns a new `Array` containing only the elements for which the `when` predicate returns `true`.
 
 ##### Signature
 
 ```typescript
-function keep<Value>(when: (value: Value) => boolean): (list: List<Value>) => List<Value>
+function keep<Value>(when: (value: Value) => boolean): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -304,47 +248,47 @@ function keep<Value>(when: (value: Value) => boolean): (list: List<Value>) => Li
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const evenNumbers = chain.of(numbers)
   .and(list.keep(n => n % 2 === 0))
   .value();
 
-console.log(evenNumbers.value());
+console.log(evenNumbers);
 // => [2, 4]
 ```
 
 #### join
 
-Concatenates the string representation of the list's elements, separated by the provided `separator` `Text` instance.
+Concatenates the string representation of the array's elements, separated by the provided `separator` string.
 
 ##### Signature
 
 ```typescript
-function join<Value>(separator: text.Text): (list: List<Value>) => text.Text
+function join<Value>(separator: string): (list: Array<Value>) => string
 ```
 
 ##### Example
 
 ```typescript
-import { chain, list, text } from "@aminnairi/prelude";
+import { chain, list } from "@aminnairi/prelude";
 
-const words = list.of("hello", "world");
+const words = ["hello", "world"];
 const sentence = chain.of(words)
-  .and(list.join(text.of(" ")))
+  .and(list.join(" "))
   .value();
 
-console.log(sentence.value());
+console.log(sentence);
 // => "hello world"
 ```
 
 #### remove
 
-Returns a new `List` containing only the elements for which the `when` predicate returns `false`.
+Returns a new `Array` containing only the elements for which the `when` predicate returns `false`.
 
 ##### Signature
 
 ```typescript
-function remove<Value>(when: (value: Value) => boolean): (list: List<Value>) => List<Value>
+function remove<Value>(when: (value: Value) => boolean): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -352,23 +296,23 @@ function remove<Value>(when: (value: Value) => boolean): (list: List<Value>) => 
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const oddNumbers = chain.of(numbers)
   .and(list.remove(n => n % 2 === 0))
   .value();
 
-console.log(oddNumbers.value());
+console.log(oddNumbers);
 // => [1, 3, 5]
 ```
 
 #### removeAt
 
-Returns a new `List` with the element at the specified `index` removed.
+Returns a new `Array` with the element at the specified `index` removed.
 
 ##### Signature
 
 ```typescript
-function removeAt<Value>(index: number): (list: List<Value>) => List<Value>
+function removeAt<Value>(index: number): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -376,23 +320,23 @@ function removeAt<Value>(index: number): (list: List<Value>) => List<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(10, 20, 30);
+const numbers = [10, 20, 30];
 const withoutMiddle = chain.of(numbers)
   .and(list.removeAt(1))
   .value();
 
-console.log(withoutMiddle.value());
+console.log(withoutMiddle);
 // => [10, 30]
 ```
 
 #### update
 
-Applies a `transform` function to each element of the `List`, returning a new `List` with the transformed elements.
+Applies a `transform` function to each element of the `Array`, returning a new `Array` with the transformed elements.
 
 ##### Signature
 
 ```typescript
-function update<Value, NewValue>(transform: (value: Value) => NewValue): (list: List<Value>) => List<NewValue>
+function update<Value, NewValue>(transform: (value: Value) => NewValue): (list: Array<Value>) => Array<NewValue>
 ```
 
 ##### Example
@@ -400,23 +344,23 @@ function update<Value, NewValue>(transform: (value: Value) => NewValue): (list: 
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3);
+const numbers = [1, 2, 3];
 const doubledNumbers = chain.of(numbers)
   .and(list.update(n => n * 2))
   .value();
 
-console.log(doubledNumbers.value());
+console.log(doubledNumbers);
 // => [2, 4, 6]
 ```
 
 #### updateAt
 
-Applies an `update` function to the element at a specific `index` of a `List` instance, returning a new `List`.
+Applies an `update` function to the element at a specific `index` of an `Array` instance, returning a new `Array`.
 
 ##### Signature
 
 ```typescript
-function updateAt<Value>(index: number, update: (value: Value) => Value): (list: List<Value>) => List<Value>
+function updateAt<Value>(index: number, update: (value: Value) => Value): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -424,23 +368,23 @@ function updateAt<Value>(index: number, update: (value: Value) => Value): (list:
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3);
+const numbers = [1, 2, 3];
 const updatedList = chain.of(numbers)
   .and(list.updateAt(1, n => n * 10))
   .value();
 
-console.log(updatedList.value());
+console.log(updatedList);
 // => [1, 20, 3]
 ```
 
 #### first
 
-Returns a `Maybe` containing the first element of the `List`, or `none` if the list is empty.
+Returns a `Maybe` containing the first element of the `Array`, or `none` if the array is empty.
 
 ##### Signature
 
 ```typescript
-function first<Value>(): (list: List<Value>) => maybe.Maybe<Value>
+function first<Value>(): (list: Array<Value>) => maybe.Maybe<Value>
 ```
 
 ##### Example
@@ -448,18 +392,14 @@ function first<Value>(): (list: List<Value>) => maybe.Maybe<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(10, 20, 30);
-const firstNumber = chain.of(numbers)
-  .and(list.first())
-  .value();
+const numbers = [10, 20, 30];
+const firstNumber = list.first()(numbers);
 
 console.log(firstNumber.or(0));
 // => 10
 
-const emptyList = list.of<number>();
-const noNumber = chain.of(emptyList)
-  .and(list.first())
-  .value();
+const emptyList = [];
+const noNumber = list.first()(emptyList);
 
 console.log(noNumber.or(0));
 // => 0
@@ -467,12 +407,12 @@ console.log(noNumber.or(0));
 
 #### last
 
-Returns a `Maybe` containing the last element of the `List`, or `none` if the list is empty.
+Returns a `Maybe` containing the last element of the `Array`, or `none` if the array is empty.
 
 ##### Signature
 
 ```typescript
-function last<Value>(): (list: List<Value>) => maybe.Maybe<Value>
+function last<Value>(): (list: Array<Value>) => maybe.Maybe<Value>
 ```
 
 ##### Example
@@ -480,18 +420,14 @@ function last<Value>(): (list: List<Value>) => maybe.Maybe<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(10, 20, 30);
-const lastNumber = chain.of(numbers)
-  .and(list.last())
-  .value();
+const numbers = [10, 20, 30];
+const lastNumber = list.last()(numbers);
 
 console.log(lastNumber.or(0));
 // => 30
 
-const emptyList = list.of<number>();
-const noNumber = chain.of(emptyList)
-  .and(list.last())
-  .value();
+const emptyList = [];
+const noNumber = list.last()(emptyList);
 
 console.log(noNumber.or(0));
 // => 0
@@ -499,12 +435,12 @@ console.log(noNumber.or(0));
 
 #### at
 
-Returns a `Maybe` containing the element at the specified `index` of the `List`, or `none` if the index is out of bounds.
+Returns a `Maybe` containing the element at the specified `index` of the `Array`, or `none` if the index is out of bounds.
 
 ##### Signature
 
 ```typescript
-function at<Value>(index: number): (list: List<Value>) => maybe.Maybe<Value>
+function at<Value>(index: number): (list: Array<Value>) => maybe.Maybe<Value>
 ```
 
 ##### Example
@@ -512,17 +448,13 @@ function at<Value>(index: number): (list: List<Value>) => maybe.Maybe<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(10, 20, 30);
-const numberAtOne = chain.of(numbers)
-  .and(list.at(1))
-  .value();
+const numbers = [10, 20, 30];
+const numberAtOne = list.at(1)(numbers);
 
 console.log(numberAtOne.or(0));
 // => 20
 
-const numberAtFive = chain.of(numbers)
-  .and(list.at(5))
-  .value();
+const numberAtFive = list.at(5)(numbers);
 
 console.log(numberAtFive.or(0));
 // => 0
@@ -530,12 +462,12 @@ console.log(numberAtFive.or(0));
 
 #### count
 
-Returns the number of elements in a `List` instance.
+Returns the number of elements in an `Array` instance.
 
 ##### Signature
 
 ```typescript
-function count<Value>(): (list: List<Value>) => number
+function count<Value>(): (list: Array<Value>) => number
 ```
 
 ##### Example
@@ -543,7 +475,7 @@ function count<Value>(): (list: List<Value>) => number
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const listCount = chain.of(numbers)
   .and(list.count())
   .value();
@@ -554,12 +486,12 @@ console.log(listCount);
 
 #### any
 
-Checks if at least one element in the `List` satisfies the provided `accept` predicate.
+Checks if at least one element in the `Array` satisfies the provided `accept` predicate.
 
 ##### Signature
 
 ```typescript
-function any<Value>(accept: (value: Value) => boolean): (list: List<Value>) => boolean
+function any<Value>(accept: (value: Value) => boolean): (list: Array<Value>) => boolean
 ```
 
 ##### Example
@@ -567,7 +499,7 @@ function any<Value>(accept: (value: Value) => boolean): (list: List<Value>) => b
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const hasEven = chain.of(numbers)
   .and(list.any(n => n % 2 === 0))
   .value();
@@ -578,12 +510,12 @@ console.log(hasEven);
 
 #### all
 
-Checks if all elements in the `List` satisfy the provided `accept` predicate.
+Checks if all elements in the `Array` satisfy the provided `accept` predicate.
 
 ##### Signature
 
 ```typescript
-function all<Value>(accept: (value: Value) => boolean): (list: List<Value>) => boolean
+function all<Value>(accept: (value: Value) => boolean): (list: Array<Value>) => boolean
 ```
 
 ##### Example
@@ -591,7 +523,7 @@ function all<Value>(accept: (value: Value) => boolean): (list: List<Value>) => b
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(2, 4, 6);
+const numbers = [2, 4, 6];
 const allEven = chain.of(numbers)
   .and(list.all(n => n % 2 === 0))
   .value();
@@ -599,7 +531,7 @@ const allEven = chain.of(numbers)
 console.log(allEven);
 // => true
 
-const mixedNumbers = list.of(1, 2, 3);
+const mixedNumbers = [1, 2, 3];
 const allEvenMixed = chain.of(mixedNumbers)
   .and(list.all(n => n % 2 === 0))
   .value();
@@ -615,7 +547,7 @@ Returns a `Maybe` containing the first element that satisfies the `accept` predi
 ##### Signature
 
 ```typescript
-function find<Value>(accept: (value: Value) => boolean): (list: List<Value>) => maybe.Maybe<Value>
+function find<Value>(accept: (value: Value) => boolean): (list: Array<Value>) => maybe.Maybe<Value>
 ```
 
 ##### Example
@@ -623,17 +555,13 @@ function find<Value>(accept: (value: Value) => boolean): (list: List<Value>) => 
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
-const firstEven = chain.of(numbers)
-  .and(list.find(n => n % 2 === 0))
-  .value();
+const numbers = [1, 2, 3, 4, 5];
+const firstEven = list.find(n => n % 2 === 0)(numbers);
 
 console.log(firstEven.or(0));
 // => 2
 
-const notFound = chain.of(numbers)
-  .and(list.find(n => n > 10))
-  .value();
+const notFound = list.find(n => n > 10)(numbers);
 
 console.log(notFound.or(0));
 // => 0
@@ -646,7 +574,7 @@ Returns a `Maybe` containing the index of the first element that satisfies the `
 ##### Signature
 
 ```typescript
-function position<Value>(is: (value: Value) => boolean): (list: List<Value>) => maybe.Maybe<number>
+function position<Value>(is: (value: Value) => boolean): (list: Array<Value>) => maybe.Maybe<number>
 ```
 
 ##### Example
@@ -654,17 +582,13 @@ function position<Value>(is: (value: Value) => boolean): (list: List<Value>) => 
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(10, 20, 30, 20);
-const indexOf20 = chain.of(numbers)
-  .and(list.position(n => n === 20))
-  .value();
+const numbers = [10, 20, 30, 20];
+const indexOf20 = list.position(n => n === 20)(numbers);
 
 console.log(indexOf20.or(-1));
 // => 1
 
-const indexOf40 = chain.of(numbers)
-  .and(list.position(n => n === 40))
-  .value();
+const indexOf40 = list.position(n => n === 40)(numbers);
 
 console.log(indexOf40.or(-1));
 // => -1
@@ -672,12 +596,12 @@ console.log(indexOf40.or(-1));
 
 #### append
 
-Appends one or more new values to the end of the `List`, returning a new `List`.
+Appends one or more new values to the end of the `Array`, returning a new `Array`.
 
 ##### Signature
 
 ```typescript
-function append<Value>(...newValues: Value[]): (list: List<Value>) => List<Value>
+function append<Value>(...newValues: Value[]): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -685,23 +609,23 @@ function append<Value>(...newValues: Value[]): (list: List<Value>) => List<Value
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2);
+const numbers = [1, 2];
 const appendedList = chain.of(numbers)
   .and(list.append(3, 4))
   .value();
 
-console.log(appendedList.value());
+console.log(appendedList);
 // => [1, 2, 3, 4]
 ```
 
 #### enumerate
 
-Returns a new `List` of tuples, where each tuple contains the index and the value of the elements in the original `List`.
+Returns a new `Array` of tuples, where each tuple contains the index and the value of the elements in the original `Array`.
 
 ##### Signature
 
 ```typescript
-function enumerate<Value>(): (list: List<Value>) => List<[number, Value]>
+function enumerate<Value>(): (list: Array<Value>) => Array<[number, Value]>
 ```
 
 ##### Example
@@ -709,23 +633,23 @@ function enumerate<Value>(): (list: List<Value>) => List<[number, Value]>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const letters = list.of("a", "b", "c");
+const letters = ["a", "b", "c"];
 const enumerated = chain.of(letters)
   .and(list.enumerate())
   .value();
 
-console.log(enumerated.value());
+console.log(enumerated);
 // => [[0, "a"], [1, "b"], [2, "c"]]
 ```
 
 #### each
 
-Applies a side-effecting `effect` function to each element of the `List`. Returns the original `List` (for chaining).
+Applies a side-effecting `effect` function to each element of the `Array`. Returns the original `Array` (for chaining).
 
 ##### Signature
 
 ```typescript
-function each<Value>(effect: (value: Value) => void): (list: List<Value>) => List<Value>
+function each<Value>(effect: (value: Value) => void): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -733,10 +657,9 @@ function each<Value>(effect: (value: Value) => void): (list: List<Value>) => Lis
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3);
+const numbers = [1, 2, 3];
 chain.of(numbers)
-  .and(list.each(n => console.log(`Processing: ${n}`)))
-  .value();
+  .and(list.each(n => console.log(`Processing: ${n}`)));
 // => Processing: 1
 // => Processing: 2
 // => Processing: 3
@@ -744,12 +667,12 @@ chain.of(numbers)
 
 #### sort
 
-Returns a new `List` with elements sorted in ascending order. (Uses default `toSorted()` behavior).
+Returns a new `Array` with elements sorted in ascending order. (Uses default `toSorted()` behavior).
 
 ##### Signature
 
 ```typescript
-function sort<Value>(): (list: List<Value>) => List<Value>
+function sort<Value>(): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -757,23 +680,23 @@ function sort<Value>(): (list: List<Value>) => List<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const unsorted = list.of(3, 1, 2);
+const unsorted = [3, 1, 2];
 const sorted = chain.of(unsorted)
   .and(list.sort())
   .value();
 
-console.log(sorted.value());
+console.log(sorted);
 // => [1, 2, 3]
 ```
 
 #### indices
 
-Returns a new `List` containing the indices of the elements in the original `List`.
+Returns a new `Array` containing the indices of the elements in the original `Array`.
 
 ##### Signature
 
 ```typescript
-function indices<Value>(): (list: List<Value>) => List<number>
+function indices<Value>(): (list: Array<Value>) => Array<number>
 ```
 
 ##### Example
@@ -781,23 +704,23 @@ function indices<Value>(): (list: List<Value>) => List<number>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const letters = list.of("a", "b", "c");
+const letters = ["a", "b", "c"];
 const listIndices = chain.of(letters)
   .and(list.indices())
   .value();
 
-console.log(listIndices.value());
+console.log(listIndices);
 // => [0, 1, 2]
 ```
 
 #### has
 
-Checks if any element in the `List` satisfies the provided `condition` predicate.
+Checks if any element in the `Array` satisfies the provided `condition` predicate.
 
 ##### Signature
 
 ```typescript
-function has<Value>(condition: (value: Value) => boolean): (list: List<Value>) => boolean
+function has<Value>(condition: (value: Value) => boolean): (list: Array<Value>) => boolean
 ```
 
 ##### Example
@@ -805,7 +728,7 @@ function has<Value>(condition: (value: Value) => boolean): (list: List<Value>) =
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(10, 20, 30);
+const numbers = [10, 20, 30];
 const hasTwenty = chain.of(numbers)
   .and(list.has(n => n === 20))
   .value();
@@ -823,12 +746,12 @@ console.log(hasForty);
 
 #### drop
 
-Returns a new `List` with the first `count` elements removed.
+Returns a new `Array` with the first `count` elements removed.
 
 ##### Signature
 
 ```typescript
-function drop<Value>(count: number): (list: List<Value>) => List<Value>
+function drop<Value>(count: number): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -836,23 +759,23 @@ function drop<Value>(count: number): (list: List<Value>) => List<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const droppedList = chain.of(numbers)
   .and(list.drop(2))
   .value();
 
-console.log(droppedList.value());
+console.log(droppedList);
 // => [3, 4, 5]
 ```
 
 #### dropLast
 
-Returns a new `List` with the last `count` elements removed.
+Returns a new `Array` with the last `count` elements removed.
 
 ##### Signature
 
 ```typescript
-function dropLast<Value>(count: number): (list: List<Value>) => List<Value>
+function dropLast<Value>(count: number): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -860,23 +783,23 @@ function dropLast<Value>(count: number): (list: List<Value>) => List<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const droppedLastList = chain.of(numbers)
   .and(list.dropLast(2))
   .value();
 
-console.log(droppedLastList.value());
+console.log(droppedLastList);
 // => [1, 2, 3]
 ```
 
 #### dropUntil
 
-Returns a new `List` by dropping elements from the beginning until the `condition` predicate returns `true`. The element that satisfies the condition is included.
+Returns a new `Array` by dropping elements from the beginning until the `condition` predicate returns `true`. The element that satisfies the condition is included.
 
 ##### Signature
 
 ```typescript
-function dropUntil<Value>(condition: (value: Value) => boolean): (list: List<Value>) => List<Value>
+function dropUntil<Value>(condition: (value: Value) => boolean): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -884,23 +807,23 @@ function dropUntil<Value>(condition: (value: Value) => boolean): (list: List<Val
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const droppedUntilList = chain.of(numbers)
   .and(list.dropUntil(n => n >= 3))
   .value();
 
-console.log(droppedUntilList.value());
+console.log(droppedUntilList);
 // => [3, 4, 5]
 ```
 
 #### take
 
-Returns a new `List` containing the first `count` elements.
+Returns a new `Array` containing the first `count` elements.
 
 ##### Signature
 
 ```typescript
-function take<Value>(count: number): (list: List<Value>) => List<Value>
+function take<Value>(count: number): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -908,23 +831,23 @@ function take<Value>(count: number): (list: List<Value>) => List<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const takenList = chain.of(numbers)
   .and(list.take(3))
   .value();
 
-console.log(takenList.value());
+console.log(takenList);
 // => [1, 2, 3]
 ```
 
 #### takeLast
 
-Returns a new `List` containing the last `count` elements.
+Returns a new `Array` containing the last `count` elements.
 
 ##### Signature
 
 ```typescript
-function takeLast<Value>(count: number): (list: List<Value>) => List<Value>
+function takeLast<Value>(count: number): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -932,23 +855,23 @@ function takeLast<Value>(count: number): (list: List<Value>) => List<Value>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const takenLastList = chain.of(numbers)
   .and(list.takeLast(3))
   .value();
 
-console.log(takenLastList.value());
+console.log(takenLastList);
 // => [3, 4, 5]
 ```
 
 #### takeUntil
 
-Returns a new `List` by taking elements from the beginning until the `condition` predicate returns `true`. The element that satisfies the condition is *not* included.
+Returns a new `Array` by taking elements from the beginning until the `condition` predicate returns `true`. The element that satisfies the condition is *not* included.
 
 ##### Signature
 
 ```typescript
-function takeUntil<Value>(condition: (value: Value) => boolean): (list: List<Value>) => List<Value>
+function takeUntil<Value>(condition: (value: Value) => boolean): (list: Array<Value>) => Array<Value>
 ```
 
 ##### Example
@@ -956,23 +879,23 @@ function takeUntil<Value>(condition: (value: Value) => boolean): (list: List<Val
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const numbers = list.of(1, 2, 3, 4, 5);
+const numbers = [1, 2, 3, 4, 5];
 const takenUntilList = chain.of(numbers)
   .and(list.takeUntil(n => n >= 3))
   .value();
 
-console.log(takenUntilList.value());
+console.log(takenUntilList);
 // => [1, 2]
 ```
 
 #### zip
 
-Combines two `List` instances into a new `List` of pairs, where the i-th pair contains the i-th element from each of the input lists. The length of the resulting list is the minimum of the two input list lengths.
+Combines two `Array` instances into a new `Array` of pairs, where the i-th pair contains the i-th element from each of the input arrays. The length of the resulting array is the minimum of the two input array lengths.
 
 ##### Signature
 
 ```typescript
-function zip<Value, OtherValue>(other: List<OtherValue>): (list: List<Value>) => List<[Value, OtherValue]>
+function zip<Value, OtherValue>(other: Array<OtherValue>): (list: Array<Value>) => Array<[Value, OtherValue]>
 ```
 
 ##### Example
@@ -980,13 +903,13 @@ function zip<Value, OtherValue>(other: List<OtherValue>): (list: List<Value>) =>
 ```typescript
 import { chain, list } from "@aminnairi/prelude";
 
-const list1 = list.of(1, 2, 3);
-const list2 = list.of("a", "b", "c", "d");
+const list1 = [1, 2, 3];
+const list2 = ["a", "b", "c", "d"];
 const zippedList = chain.of(list1)
   .and(list.zip(list2))
   .value();
 
-console.log(zippedList.value());
+console.log(zippedList);
 // => [[1, "a"], [2, "b"], [3, "c"]]
 ```
 
@@ -1134,40 +1057,14 @@ userProfile.when(
 
 The `numeric` module provides functions for performing immutable numeric operations and comparisons using a functional approach.
 
-#### of
-
-Creates a `Numeric` instance from a number.
-
-##### Signature
-
-```typescript
-function of(value: number): Numeric
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const myNumber = numeric.of(10);
-console.log(myNumber.value());
-// => 10
-
-const chainedNumber = chain.of(20)
-  .and(numeric.of)
-  .value();
-console.log(chainedNumber.value());
-// => 20
-```
-
 #### between
 
-Checks if a `Numeric` value is inclusively between a `lowerbound` and an `upperbound`.
+Checks if a number is inclusively between a `lowerbound` and an `upperbound`.
 
 ##### Signature
 
 ```typescript
-function between(lowerbound: Numeric, upperbound: Numeric): (numeric: Numeric) => boolean
+function between(lowerbound: number, upperbound: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1175,15 +1072,15 @@ function between(lowerbound: Numeric, upperbound: Numeric): (numeric: Numeric) =
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isBetween = chain.of(numeric.of(5))
-  .and(numeric.between(numeric.of(1), numeric.of(10)))
+const isBetween = chain.of(5)
+  .and(numeric.between(1, 10))
   .value();
 
 console.log(isBetween);
 // => true
 
-const isNotBetween = chain.of(numeric.of(15))
-  .and(numeric.between(numeric.of(1), numeric.of(10)))
+const isNotBetween = chain.of(15)
+  .and(numeric.between(1, 10))
   .value();
 
 console.log(isNotBetween);
@@ -1192,12 +1089,12 @@ console.log(isNotBetween);
 
 #### equalTo
 
-Checks if a `Numeric` value is equal to another `Numeric` value.
+Checks if a number is equal to another number.
 
 ##### Signature
 
 ```typescript
-function equalTo(other: Numeric): (numeric: Numeric) => boolean
+function equalTo(other: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1205,8 +1102,8 @@ function equalTo(other: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isEqual = chain.of(numeric.of(5))
-  .and(numeric.equalTo(numeric.of(5)))
+const isEqual = chain.of(5)
+  .and(numeric.equalTo(5))
   .value();
 
 console.log(isEqual);
@@ -1215,12 +1112,12 @@ console.log(isEqual);
 
 #### differentThan
 
-Checks if a `Numeric` value is different from another `Numeric` value.
+Checks if a number is different from another number.
 
 ##### Signature
 
 ```typescript
-function differentThan(other: Numeric): (numeric: Numeric) => boolean
+function differentThan(other: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1228,8 +1125,8 @@ function differentThan(other: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isDifferent = chain.of(numeric.of(5))
-  .and(numeric.differentThan(numeric.of(10)))
+const isDifferent = chain.of(5)
+  .and(numeric.differentThan(10))
   .value();
 
 console.log(isDifferent);
@@ -1238,12 +1135,12 @@ console.log(isDifferent);
 
 #### greaterThan
 
-Checks if a `Numeric` value is greater than another `Numeric` value.
+Checks if a number is greater than another number.
 
 ##### Signature
 
 ```typescript
-function greaterThan(other: Numeric): (numeric: Numeric) => boolean
+function greaterThan(other: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1251,8 +1148,8 @@ function greaterThan(other: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isGreater = chain.of(numeric.of(10))
-  .and(numeric.greaterThan(numeric.of(5)))
+const isGreater = chain.of(10)
+  .and(numeric.greaterThan(5))
   .value();
 
 console.log(isGreater);
@@ -1261,12 +1158,12 @@ console.log(isGreater);
 
 #### lowerThan
 
-Checks if a `Numeric` value is lower than another `Numeric` value.
+Checks if a number is lower than another number.
 
 ##### Signature
 
 ```typescript
-function lowerThan(other: Numeric): (numeric: Numeric) => boolean
+function lowerThan(other: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1274,8 +1171,8 @@ function lowerThan(other: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isLower = chain.of(numeric.of(5))
-  .and(numeric.lowerThan(numeric.of(10)))
+const isLower = chain.of(5)
+  .and(numeric.lowerThan(10))
   .value();
 
 console.log(isLower);
@@ -1284,12 +1181,12 @@ console.log(isLower);
 
 #### greaterOrEqualTo
 
-Checks if a `Numeric` value is greater than or equal to another `Numeric` value.
+Checks if a number is greater than or equal to another number.
 
 ##### Signature
 
 ```typescript
-function greaterOrEqualTo(other: Numeric): (numeric: Numeric) => boolean
+function greaterOrEqualTo(other: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1297,8 +1194,8 @@ function greaterOrEqualTo(other: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isGreaterOrEqual = chain.of(numeric.of(10))
-  .and(numeric.greaterOrEqualTo(numeric.of(10)))
+const isGreaterOrEqual = chain.of(10)
+  .and(numeric.greaterOrEqualTo(10))
   .value();
 
 console.log(isGreaterOrEqual);
@@ -1307,12 +1204,12 @@ console.log(isGreaterOrEqual);
 
 #### lowerOrEqualTo
 
-Checks if a `Numeric` value is lower than or equal to another `Numeric` value.
+Checks if a number is lower than or equal to another number.
 
 ##### Signature
 
 ```typescript
-function lowerOrEqualTo(other: Numeric): (numeric: Numeric) => boolean
+function lowerOrEqualTo(other: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1320,8 +1217,8 @@ function lowerOrEqualTo(other: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isLowerOrEqual = chain.of(numeric.of(5))
-  .and(numeric.lowerOrEqualTo(numeric.of(5)))
+const isLowerOrEqual = chain.of(5)
+  .and(numeric.lowerOrEqualTo(5))
   .value();
 
 console.log(isLowerOrEqual);
@@ -1330,12 +1227,12 @@ console.log(isLowerOrEqual);
 
 #### divisibleBy
 
-Checks if a `Numeric` value is divisible by another `Numeric` value.
+Checks if a number is divisible by another number.
 
 ##### Signature
 
 ```typescript
-function divisibleBy(divider: Numeric): (numeric: Numeric) => boolean
+function divisibleBy(divider: number): (numeric: number) => boolean
 ```
 
 ##### Example
@@ -1343,8 +1240,8 @@ function divisibleBy(divider: Numeric): (numeric: Numeric) => boolean
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const isDivisible = chain.of(numeric.of(10))
-  .and(numeric.divisibleBy(numeric.of(2)))
+const isDivisible = chain.of(10)
+  .and(numeric.divisibleBy(2))
   .value();
 
 console.log(isDivisible);
@@ -1353,12 +1250,12 @@ console.log(isDivisible);
 
 #### add
 
-Adds two `Numeric` values.
+Adds two numbers.
 
 ##### Signature
 
 ```typescript
-function add(second: Numeric): (first: Numeric) => Numeric
+function add(second: number): (first: number) => number
 ```
 
 ##### Example
@@ -1366,22 +1263,22 @@ function add(second: Numeric): (first: Numeric) => Numeric
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const sum = chain.of(numeric.of(5))
-  .and(numeric.add(numeric.of(3)))
+const sum = chain.of(5)
+  .and(numeric.add(3))
   .value();
 
-console.log(sum.value());
+console.log(sum);
 // => 8
 ```
 
 #### subtract
 
-Subtracts the `second` `Numeric` value from the `first` `Numeric` value.
+Subtracts the `second` number from the `first` number.
 
 ##### Signature
 
 ```typescript
-function subtract(second: Numeric): (first: Numeric) => Numeric
+function subtract(second: number): (first: number) => number
 ```
 
 ##### Example
@@ -1389,22 +1286,22 @@ function subtract(second: Numeric): (first: Numeric) => Numeric
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const difference = chain.of(numeric.of(10))
-  .and(numeric.subtract(numeric.of(4)))
+const difference = chain.of(10)
+  .and(numeric.subtract(4))
   .value();
 
-console.log(difference.value());
+console.log(difference);
 // => 6
 ```
 
 #### multiply
 
-Multiplies two `Numeric` values.
+Multiplies two numbers.
 
 ##### Signature
 
 ```typescript
-function multiply(second: Numeric): (first: Numeric) => Numeric
+function multiply(second: number): (first: number) => number
 ```
 
 ##### Example
@@ -1412,22 +1309,22 @@ function multiply(second: Numeric): (first: Numeric) => Numeric
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const product = chain.of(numeric.of(6))
-  .and(numeric.multiply(numeric.of(7)))
+const product = chain.of(6)
+  .and(numeric.multiply(7))
   .value();
 
-console.log(product.value());
+console.log(product);
 // => 42
 ```
 
 #### divide
 
-Divides the `first` `Numeric` value by the `second` `Numeric` value. Returns a `Maybe<Numeric>` to handle division by zero.
+Divides the `first` number by the `second` number. Returns a `Maybe<number>` to handle division by zero.
 
 ##### Signature
 
 ```typescript
-function divide(second: Numeric): (first: Numeric) => maybe.Maybe<Numeric>
+function divide(second: number): (first: number) => maybe.Maybe<number>
 ```
 
 ##### Example
@@ -1435,29 +1332,29 @@ function divide(second: Numeric): (first: Numeric) => maybe.Maybe<Numeric>
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const quotient = chain.of(numeric.of(10))
-  .and(numeric.divide(numeric.of(2)))
+const quotient = chain.of(10)
+  .and(numeric.divide(2))
   .value();
 
-console.log(quotient.or(numeric.of(0)).value());
+console.log(quotient.or(0));
 // => 5
 
-const divisionByZero = chain.of(numeric.of(10))
-  .and(numeric.divide(numeric.of(0)))
+const divisionByZero = chain.of(10)
+  .and(numeric.divide(0))
   .value();
 
-console.log(divisionByZero.or(numeric.of(0)).value());
+console.log(divisionByZero.or(0));
 // => 0
 ```
 
 #### toPower
 
-Raises a `Numeric` value to the power of another `Numeric` value.
+Raises a number to the power of another number.
 
 ##### Signature
 
 ```typescript
-function toPower(power: Numeric): (numeric: Numeric) => number
+function toPower(power: number): (numeric: number) => number
 ```
 
 ##### Example
@@ -1465,8 +1362,8 @@ function toPower(power: Numeric): (numeric: Numeric) => number
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const result = chain.of(numeric.of(2))
-  .and(numeric.toPower(numeric.of(3)))
+const result = chain.of(2)
+  .and(numeric.toPower(3))
   .value();
 
 console.log(result);
@@ -1475,12 +1372,12 @@ console.log(result);
 
 #### maximum
 
-Returns a `Numeric` instance representing the maximum of the given `numeric` and additional `numerics`.
+Returns the maximum of the given number and additional numbers.
 
 ##### Signature
 
 ```typescript
-function maximum(...numerics: Numeric[]): (numeric: Numeric) => Numeric
+function maximum(...numerics: number[]): (numeric: number) => number
 ```
 
 ##### Example
@@ -1488,22 +1385,22 @@ function maximum(...numerics: Numeric[]): (numeric: Numeric) => Numeric
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const maxNumber = chain.of(numeric.of(5))
-  .and(numeric.maximum(numeric.of(10), numeric.of(2)))
+const maxNumber = chain.of(5)
+  .and(numeric.maximum(10, 2))
   .value();
 
-console.log(maxNumber.value());
+console.log(maxNumber);
 // => 10
 ```
 
 #### minimum
 
-Returns a `Numeric` instance representing the minimum of the given `numeric` and additional `numerics`.
+Returns the minimum of the given number and additional numbers.
 
 ##### Signature
 
 ```typescript
-function minimum(...numerics: Numeric[]): (numeric: Numeric) => Numeric
+function minimum(...numerics: number[]): (numeric: number) => number
 ```
 
 ##### Example
@@ -1511,22 +1408,22 @@ function minimum(...numerics: Numeric[]): (numeric: Numeric) => Numeric
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const minNumber = chain.of(numeric.of(5))
-  .and(numeric.minimum(numeric.of(10), numeric.of(2)))
+const minNumber = chain.of(5)
+  .and(numeric.minimum(10, 2))
   .value();
 
-console.log(minNumber.value());
+console.log(minNumber);
 // => 2
 ```
 
 #### compare
 
-Compares two `Numeric` values and returns a `Comparison` enum indicating whether the first is `Greater`, `Lower`, or `Equal` to the second.
+Compares two numbers and returns a `Comparison` enum indicating whether the first is `Greater`, `Lower`, or `Equal` to the second.
 
 ##### Signature
 
 ```typescript
-function compare(second: Numeric): (first: Numeric) => Comparison
+function compare(second: number): (first: number) => Comparison
 ```
 
 ##### Example
@@ -1534,8 +1431,8 @@ function compare(second: Numeric): (first: Numeric) => Comparison
 ```typescript
 import { chain, numeric } from "@aminnairi/prelude";
 
-const comparisonResult = chain.of(numeric.of(10))
-  .and(numeric.compare(numeric.of(5)))
+const comparisonResult = chain.of(10)
+  .and(numeric.compare(5))
   .value();
 
 console.log(comparisonResult === numeric.Comparison.Greater);

@@ -6,8 +6,8 @@ import * as maybe from "./maybe";
 describe("numeric", () => {
   test("equalTo", () => {
     const result = chain
-      .of(numeric.of(123))
-      .and(numeric.equalTo(numeric.of(123)))
+      .of(123)
+      .and(numeric.equalTo(123))
       .value();
 
     expect(result).toBe(true);
@@ -15,8 +15,8 @@ describe("numeric", () => {
 
   test("differentThan", () => {
     const result = chain
-      .of(numeric.of(123))
-      .and(numeric.differentThan(numeric.of(456)))
+      .of(123)
+      .and(numeric.differentThan(456))
       .value();
 
     expect(result).toBe(true);
@@ -24,18 +24,18 @@ describe("numeric", () => {
 
   test("between", () => {
     const result = chain
-      .of(numeric.of(123))
-      .and(numeric.between(numeric.of(100), numeric.of(200)))
+      .of(123)
+      .and(numeric.between(100, 200))
       .value();
 
     const lower = chain
-      .of(numeric.of(50))
-      .and(numeric.between(numeric.of(100), numeric.of(200)))
+      .of(50)
+      .and(numeric.between(100, 200))
       .value();
 
     const greater = chain
-      .of(numeric.of(250))
-      .and(numeric.between(numeric.of(100), numeric.of(200)))
+      .of(250)
+      .and(numeric.between(100, 200))
       .value();
 
     expect(result).toBe(true);
@@ -45,13 +45,13 @@ describe("numeric", () => {
 
   test("greaterThan", () => {
     const greater = chain
-      .of(numeric.of(123))
-      .and(numeric.greaterThan(numeric.of(100)))
+      .of(123)
+      .and(numeric.greaterThan(100))
       .value();
 
     const notGreater = chain
-      .of(numeric.of(123))
-      .and(numeric.greaterThan(numeric.of(200)))
+      .of(123)
+      .and(numeric.greaterThan(200))
       .value();
 
     expect(greater).toBe(true);
@@ -60,13 +60,13 @@ describe("numeric", () => {
 
   test("lowerThan", () => {
     const lowerThan = chain
-      .of(numeric.of(123))
-      .and(numeric.lowerThan(numeric.of(200)))
+      .of(123)
+      .and(numeric.lowerThan(200))
       .value();
 
     const notLowerThan = chain
-      .of(numeric.of(123))
-      .and(numeric.lowerThan(numeric.of(50)))
+      .of(123)
+      .and(numeric.lowerThan(50))
       .value();
 
     expect(lowerThan).toBe(true);
@@ -75,18 +75,18 @@ describe("numeric", () => {
 
   test("greaterOrEqualTo", () => {
     const greater = chain
-      .of(numeric.of(123))
-      .and(numeric.greaterOrEqualTo(numeric.of(50)))
+      .of(123)
+      .and(numeric.greaterOrEqualTo(50))
       .value();
 
     const equal = chain
-      .of(numeric.of(123))
-      .and(numeric.greaterOrEqualTo(numeric.of(123)))
+      .of(123)
+      .and(numeric.greaterOrEqualTo(123))
       .value();
 
     const lower = chain
-      .of(numeric.of(123))
-      .and(numeric.greaterOrEqualTo(numeric.of(200)))
+      .of(123)
+      .and(numeric.greaterOrEqualTo(200))
       .value();
 
     expect(greater).toBe(true);
@@ -94,20 +94,20 @@ describe("numeric", () => {
     expect(lower).toBe(false);
   });
 
-  test("greaterOrEqualTo", () => {
+  test("lowerOrEqualTo", () => {
     const greater = chain
-      .of(numeric.of(123))
-      .and(numeric.lowerOrEqualTo(numeric.of(50)))
+      .of(123)
+      .and(numeric.lowerOrEqualTo(50))
       .value();
 
     const equal = chain
-      .of(numeric.of(123))
-      .and(numeric.lowerOrEqualTo(numeric.of(123)))
+      .of(123)
+      .and(numeric.lowerOrEqualTo(123))
       .value();
 
     const lower = chain
-      .of(numeric.of(123))
-      .and(numeric.lowerOrEqualTo(numeric.of(200)))
+      .of(123)
+      .and(numeric.lowerOrEqualTo(200))
       .value();
 
     expect(greater).toBe(false);
@@ -117,8 +117,8 @@ describe("numeric", () => {
 
   test("divisible", () => {
     const value = chain
-      .of(numeric.of(100))
-      .and(numeric.divisibleBy(numeric.of(2)))
+      .of(100)
+      .and(numeric.divisibleBy(2))
       .value();
 
     expect(value).toBe(true);
@@ -126,9 +126,8 @@ describe("numeric", () => {
 
   test("add", () => {
     const value = chain
-      .of(numeric.of(123))
-      .and(numeric.add(numeric.of(123)))
-      .value()
+      .of(123)
+      .and(numeric.add(123))
       .value();
 
     expect(value).toStrictEqual(246);
@@ -136,20 +135,17 @@ describe("numeric", () => {
 
   test("subtract", () => {
     const value = chain
-      .of(numeric.of(123))
-      .and(numeric.subtract(numeric.of(123)))
-      .value()
+      .of(123)
+      .and(numeric.subtract(123))
       .value();
 
     expect(value).toStrictEqual(0);
   });
 
-  test("subtract", () => {
-
+  test("multiply", () => {
     const value = chain
-      .of(numeric.of(123))
-      .and(numeric.multiply(numeric.of(2)))
-      .value()
+      .of(123)
+      .and(numeric.multiply(2))
       .value();
 
     expect(value).toStrictEqual(246);
@@ -157,18 +153,16 @@ describe("numeric", () => {
 
   test("divide", () => {
     const value = chain
-      .of(numeric.of(200))
-      .and(numeric.divide(numeric.of(2)))
-      .and(maybe.or(numeric.of(0)))
+      .of(200)
+      .and(numeric.divide(2))
       .value()
-      .value();
+      .or(0);
 
     const nothing = chain
-      .of(numeric.of(200))
-      .and(numeric.divide(numeric.of(0)))
+      .of(200)
+      .and(numeric.divide(0))
       .value()
-      .or(numeric.of(0))
-      .value();
+      .or(0);
 
     expect(value).toStrictEqual(100);
     expect(nothing).toStrictEqual(0);
@@ -176,8 +170,8 @@ describe("numeric", () => {
 
   test("toPower", () => {
     const value = chain
-      .of(numeric.of(2))
-      .and(numeric.toPower(numeric.of(8)))
+      .of(2)
+      .and(numeric.toPower(8))
       .value();
 
     expect(value).toStrictEqual(256);
@@ -185,9 +179,8 @@ describe("numeric", () => {
 
   test("max", () => {
     const value = chain
-      .of(numeric.of(10))
-      .and(numeric.maximum(numeric.of(5), numeric.of(6)))
-      .value()
+      .of(10)
+      .and(numeric.maximum(5, 6))
       .value();
 
     expect(value).toStrictEqual(10);
@@ -195,9 +188,8 @@ describe("numeric", () => {
 
   test("min", () => {
     const value = chain
-      .of(numeric.of(10))
-      .and(numeric.minimum(numeric.of(5), numeric.of(6)))
-      .value()
+      .of(10)
+      .and(numeric.minimum(5, 6))
       .value();
 
     expect(value).toStrictEqual(5);
@@ -205,18 +197,18 @@ describe("numeric", () => {
 
   test("compare", () => {
     const greater = chain
-      .of(numeric.of(10))
-      .and(numeric.compare(numeric.of(5)))
+      .of(10)
+      .and(numeric.compare(5))
       .value();
 
     const lower = chain
-      .of(numeric.of(10))
-      .and(numeric.compare(numeric.of(20)))
+      .of(10)
+      .and(numeric.compare(20))
       .value();
 
     const equal = chain
-      .of(numeric.of(10))
-      .and(numeric.compare(numeric.of(10)))
+      .of(10)
+      .and(numeric.compare(10))
       .value();
 
     expect(greater).toStrictEqual(numeric.Comparison.Greater);

@@ -6,25 +6,17 @@ export enum Comparison {
   Equal,
 }
 
-export interface Numeric {
-  value: () => number;
-}
 
-export const of = (value: number): Numeric => {
-  return {
-    value: () => value,
-  };
-};
 
-export const between = (lowerbound: Numeric, upperbound: Numeric) => {
-  return (numeric: Numeric) => {
-    const value = numeric.value();
+export const between = (lowerbound: number, upperbound: number) => {
+  return (numeric: number) => {
+    const value = numeric;
 
-    if (value < lowerbound.value()) {
+    if (value < lowerbound) {
       return false;
     }
 
-    if (value > upperbound.value()) {
+    if (value > upperbound) {
       return false;
     }
 
@@ -32,100 +24,98 @@ export const between = (lowerbound: Numeric, upperbound: Numeric) => {
   };
 };
 
-export const equalTo = (other: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() === other.value();
+export const equalTo = (other: number) => {
+  return (numeric: number) => {
+    return numeric === other;
   };
 };
 
-export const differentThan = (other: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() !== other.value();
+export const differentThan = (other: number) => {
+  return (numeric: number) => {
+    return numeric !== other;
   };
 };
 
-export const greaterThan = (other: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() > other.value();
+export const greaterThan = (other: number) => {
+  return (numeric: number) => {
+    return numeric > other;
   };
 };
 
-export const lowerThan = (other: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() < other.value();
+export const lowerThan = (other: number) => {
+  return (numeric: number) => {
+    return numeric < other;
   };
 };
 
-export const greaterOrEqualTo = (other: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() >= other.value();
+export const greaterOrEqualTo = (other: number) => {
+  return (numeric: number) => {
+    return numeric >= other;
   };
 };
 
-export const lowerOrEqualTo = (other: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() <= other.value();
+export const lowerOrEqualTo = (other: number) => {
+  return (numeric: number) => {
+    return numeric <= other;
   };
 };
 
-export const divisibleBy = (divider: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() % divider.value() === 0;
+export const divisibleBy = (divider: number) => {
+  return (numeric: number) => {
+    return numeric % divider === 0;
   };
 };
 
-export const add = (second: Numeric) => {
-  return (first: Numeric) => {
-    return of(first.value() + second.value());
+export const add = (second: number) => {
+  return (first: number) => {
+    return first + second;
   };
 };
 
-export const subtract = (second: Numeric) => {
-  return (first: Numeric) => {
-    return of(first.value() - second.value());
+export const subtract = (second: number) => {
+  return (first: number) => {
+    return first - second;
   };
 };
 
-export const multiply = (second: Numeric) => {
-  return (first: Numeric) => {
-    return of(first.value() * second.value());
+export const multiply = (second: number) => {
+  return (first: number) => {
+    return first * second;
   };
 };
 
-export const divide = (second: Numeric) => {
-  return (first: Numeric) => {
-    const secondValue = second.value();
-
-    if (secondValue === 0) {
-      return maybe.none<Numeric>();
+export const divide = (second: number) => {
+  return (first: number) => {
+    if (second === 0) {
+      return maybe.none<number>();
     }
 
-    return maybe.some(of(first.value() / second.value()));
+    return maybe.some(first / second);
   };
 };
 
-export const toPower = (power: Numeric) => {
-  return (numeric: Numeric) => {
-    return numeric.value() ** power.value();
+export const toPower = (power: number) => {
+  return (numeric: number) => {
+    return numeric ** power;
   };
 };
 
-export const maximum = (...numerics: Numeric[]) => {
-  return (numeric: Numeric) => {
-    return of(Math.max(numeric.value(), ...numerics.map(numeric => numeric.value())));
+export const maximum = (...numerics: number[]) => {
+  return (numeric: number) => {
+    return Math.max(numeric, ...numerics);
   };
 };
 
-export const minimum = (...numerics: Numeric[]) => {
-  return (numeric: Numeric) => {
-    return of(Math.min(numeric.value(), ...numerics.map(numeric => numeric.value())));
+export const minimum = (...numerics: number[]) => {
+  return (numeric: number) => {
+    return Math.min(numeric, ...numerics);
   };
 };
 
-export const compare = (second: Numeric) => {
-  return (first: Numeric) => {
-    const firstValue = first.value();
-    const secondValue = second.value();
+export const compare = (second: number) => {
+  return (first: number) => {
+    const firstValue = first;
+    const secondValue = second;
 
     if (firstValue > secondValue) {
       return Comparison.Greater;

@@ -6,10 +6,17 @@ const file = `
   11;12;13;14;15
 `;
 
-chain.of(file)
-  .and(text.of)
+const identity = <Value>() => (value: Value) => value;
+
+chain.of("")
   .and(text.lines())
-  .and(list.update(line => chain.of(line).and(text.split(text.of(";"))).value()))
+  .and(list.update(text.toInteger()))
+  .and(list.update(maybe.or(0)))
+
+
+chain.of(file)
+  .and(text.lines())
+  .and(list.update(line => chain.of(line).and(text.split(";")).value()))
   .and(list.update(line => chain.of(line).and(list.update(text.toInteger())).value()))
-  .and(list.update(line => chain.of(line).and(list.update(maybe.or(numeric.of(0)))).value()))
-  .and(list.update(line => chain.of(line).and(list.upgrade(numeric.of(0), (total, value) => chain.of(value).and(numeric.add(total)).value())).value()))
+  .and(list.update(line => chain.of(line).and(list.update(maybe.or(0))).value()))
+  .and(list.update(line => chain.of(line).and(list.upgrade(0, (total, value) => chain.of(value).and(numeric.add(total)).value()))))

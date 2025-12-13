@@ -1,73 +1,60 @@
 import * as maybe from "./maybe";
-import * as text from "./text";
-
-export interface List<Value> {
-  value: () => Array<Value>;
-}
-
-export const of = <Value = never>(...values: Value[]): List<Value> => {
-  return {
-    value() {
-      return values;
-    },
-  };
-};
 
 export const keep = <Value>(when: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    return of(...list.value().filter(value => {
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.filter(value => {
       return when(value);
-    }));
+    })];
   };
 };
 
-export const join = <Value>(separator: text.Text) => {
-  return (list: List<Value>) => {
-    return text.of(list.value().join(separator.value()));
+export const join = <Value>(separator: string) => {
+  return (list: Array<Value>): string => {
+    return list.join(separator);
   };
 };
 
 export const remove = <Value>(when: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    return of(...list.value().filter(value => {
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.filter(value => {
       return !when(value);
-    }));
+    })];
   };
 };
 
 
 export const removeAt = <Value>(index: number) => {
-  return (list: List<Value>) => {
-    return of(...list.value().filter((_, currentIndex) => {
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.filter((_, currentIndex) => {
       return index !== currentIndex;
-    }));
+    })];
   };
 };
 
 
 export const update = <Value, NewValue>(transform: (value: Value) => NewValue) => {
-  return (list: List<Value>) => {
-    return of(...list.value().map(value => transform(value)));
+  return (list: Array<Value>): Array<NewValue> => {
+    return [...list.map(value => transform(value))];
   };
 };
 
 
 export const updateAt = <Value>(index: number, update: (value: Value) => Value) => {
-  return (list: List<Value>) => {
-    return of(...list.value().map((value, currentIndex) => {
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.map((value, currentIndex) => {
       if (currentIndex !== index) {
         return value;
       }
 
       return update(value);
-    }));
+    })];
   };
 };
 
 export const first = <Value>() => {
-  return (list: List<Value>) => {
+  return (list: Array<Value>) => {
 
-    const value = list.value().at(0);
+    const value = list.at(0);
 
     if (!value) {
       return maybe.none<Value>();
@@ -78,8 +65,8 @@ export const first = <Value>() => {
 };
 
 export const last = <Value>() => {
-  return (list: List<Value>) => {
-    const value = list.value().at(-1);
+  return (list: Array<Value>) => {
+    const value = list.at(-1);
 
     if (!value) {
       return maybe.none<Value>();
@@ -90,8 +77,8 @@ export const last = <Value>() => {
 };
 
 export const at = <Value>(index: number) => {
-  return (list: List<Value>) => {
-    const value = list.value().at(index);
+  return (list: Array<Value>) => {
+    const value = list.at(index);
 
     if (!value) {
       return maybe.none<Value>();
@@ -102,30 +89,30 @@ export const at = <Value>(index: number) => {
 };
 
 export const count = <Value>() => {
-  return (list: List<Value>) => {
-    return list.value().length;
+  return (list: Array<Value>) => {
+    return list.length;
   };
 };
 
 export const any = <Value>(accept: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    return list.value().some(value => {
+  return (list: Array<Value>) => {
+    return list.some(value => {
       return accept(value);
     });
   };
 };
 
 export const all = <Value>(accept: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    return list.value().every(value => {
+  return (list: Array<Value>) => {
+    return list.every(value => {
       return accept(value);
     });
   };
 };
 
 export const find = <Value>(accept: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    const value = list.value().find(value => {
+  return (list: Array<Value>) => {
+    const value = list.find(value => {
       return accept(value);
     });
 
@@ -138,8 +125,8 @@ export const find = <Value>(accept: (value: Value) => boolean) => {
 };
 
 export const position = <Value>(is: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    const result = list.value().findIndex(value => {
+  return (list: Array<Value>) => {
+    const result = list.findIndex(value => {
       return is(value);
     });
 
@@ -152,44 +139,44 @@ export const position = <Value>(is: (value: Value) => boolean) => {
 };
 
 export const append = <Value>(...newValues: Value[]) => {
-  return (list: List<Value>) => {
-    return of(...list.value(), ...newValues);
+  return (list: Array<Value>): Array<Value> => {
+    return [...list, ...newValues];
   };
 };
 
 export const enumerate = <Value>() => {
-  return (list: List<Value>) => {
-    return of(...list.value().entries());
+  return (list: Array<Value>): Array<[number, Value]> => {
+    return [...list.entries()];
   };
 };
 
 export const each = <Value>(effect: (value: Value) => void) => {
-  return (list: List<Value>) => {
-    const values = list.value();
+  return (list: Array<Value>): Array<Value> => {
+    const values = list;
 
     values.forEach(value => {
       effect(value);
     });
 
-    return of(...values);
+    return [...values];
   };
 };
 
 export const sort = <Value>() => {
-  return (list: List<Value>) => {
-    return of(...list.value().toSorted());
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.toSorted()];
   };
 };
 
 export const indices = <Value>() => {
-  return (list: List<Value>) => {
-    return of(...list.value().keys());
+  return (list: Array<Value>): Array<number> => {
+    return [...list.keys()];
   };
 };
 
 export const has = <Value>(condition: (value: Value) => boolean) => {
-  return (list: List<Value>) => {
-    const found = list.value().find(value => {
+  return (list: Array<Value>) => {
+    const found = list.find(value => {
       return condition(value);
     });
 
@@ -198,69 +185,69 @@ export const has = <Value>(condition: (value: Value) => boolean) => {
 };
 
 export const drop = <Value>(count: number) => {
-  return (list: List<Value>) => {
-    return of(...list.value().slice(count));
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.slice(count)];
   };
 };
 
 export const dropLast = <Value>(count: number) => {
-  return (list: List<Value>) => {
-    return of(...list.value().slice(0, -count));
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.slice(0, -count)];
   };
 };
 
 export const dropUntil = <Value>(condition: (value: Value) => boolean) => {
-  return (list: List<Value>): List<Value> => {
-    const [value, ...remainingValues] = list.value();
+  return (list: Array<Value>): Array<Value> => {
+    const [value, ...remainingValues] = list;
 
     if (!value) {
-      return of(...remainingValues);
+      return [...remainingValues];
     }
 
     const refused = condition(value);
 
     if (refused) {
-      return dropUntil(condition)(of(...remainingValues));
+      return dropUntil(condition)([...remainingValues]);
     }
 
-    return of(value, ...remainingValues);
+    return [value, ...remainingValues];
   };
 };
 
 export const take = <Value>(count: number) => {
-  return (list: List<Value>) => {
-    return of(...list.value().slice(0, count));
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.slice(0, count)];
   };
 };
 
 export const takeLast = <Value>(count: number) => {
-  return (list: List<Value>) => {
-    return of(...list.value().slice(count - 1));
+  return (list: Array<Value>): Array<Value> => {
+    return [...list.slice(count - 1)];
   };
 };
 
 export const takeUntil = <Value>(condition: (value: Value) => boolean) => {
-  return (list: List<Value>): List<Value> => {
-    const [value, ...remainingValues] = list.value();
+  return (list: Array<Value>): Array<Value> => {
+    const [value, ...remainingValues] = list;
 
     if (!value) {
-      return of();
+      return [];
     }
 
     const refused = condition(value);
 
     if (refused) {
-      return of();
+      return [];
     }
 
-    return of(value, ...takeUntil(condition)(of(...remainingValues)).value());
+    return [value, ...takeUntil(condition)(remainingValues)];
   };
 };
 
-export const zip = <Value, OtherValue>(other: List<OtherValue>) => {
-  return (list: List<Value>): List<[Value, OtherValue]> => {
-    const arrayList = list.value();
-    const otherArrayList = other.value();
+export const zip = <Value, OtherValue>(other: Array<OtherValue>) => {
+  return (list: Array<Value>): Array<[Value, OtherValue]> => {
+    const arrayList = list;
+    const otherArrayList = other;
     const length = Math.min(arrayList.length, otherArrayList.length);
     const result: [Value, OtherValue][] = [];
 
@@ -268,14 +255,16 @@ export const zip = <Value, OtherValue>(other: List<OtherValue>) => {
       result.push([arrayList[i]!, otherArrayList[i]!]); // Using non-null assertion operator
     }
 
-    return of(...result);
+    return [...result];
   };
 }
 
 export const upgrade = <Value, NewValue>(value: NewValue, reducer: (previous: NewValue, current: Value) => NewValue) => {
-  return (list: List<Value>) => {
-    return list.value().reduce((previous, current) => {
+  return (list: Array<Value>) => {
+    return list.reduce((previous, current) => {
       return reducer(previous, current);
     }, value);
   };
 };
+
+
