@@ -1,41 +1,41 @@
 import { describe, test, expect } from "vitest";
 import * as numeric from "./numeric";
-import * as stream from "./stream";
+import * as chain from "./chain";
 import * as maybe from "./maybe";
 
 describe("numeric", () => {
   test("equalTo", () => {
-    const result = stream
+    const result = chain
       .of(numeric.of(123))
-      .next(numeric.equalTo(numeric.of(123)))
+      .and(numeric.equalTo(numeric.of(123)))
       .value();
 
     expect(result).toBe(true);
   });
 
   test("differentThan", () => {
-    const result = stream
+    const result = chain
       .of(numeric.of(123))
-      .next(numeric.differentThan(numeric.of(456)))
+      .and(numeric.differentThan(numeric.of(456)))
       .value();
 
     expect(result).toBe(true);
   });
 
   test("between", () => {
-    const result = stream
+    const result = chain
       .of(numeric.of(123))
-      .next(numeric.between(numeric.of(100), numeric.of(200)))
+      .and(numeric.between(numeric.of(100), numeric.of(200)))
       .value();
 
-    const lower = stream
+    const lower = chain
       .of(numeric.of(50))
-      .next(numeric.between(numeric.of(100), numeric.of(200)))
+      .and(numeric.between(numeric.of(100), numeric.of(200)))
       .value();
 
-    const greater = stream
+    const greater = chain
       .of(numeric.of(250))
-      .next(numeric.between(numeric.of(100), numeric.of(200)))
+      .and(numeric.between(numeric.of(100), numeric.of(200)))
       .value();
 
     expect(result).toBe(true);
@@ -44,14 +44,14 @@ describe("numeric", () => {
   });
 
   test("greaterThan", () => {
-    const greater = stream
+    const greater = chain
       .of(numeric.of(123))
-      .next(numeric.greaterThan(numeric.of(100)))
+      .and(numeric.greaterThan(numeric.of(100)))
       .value();
 
-    const notGreater = stream
+    const notGreater = chain
       .of(numeric.of(123))
-      .next(numeric.greaterThan(numeric.of(200)))
+      .and(numeric.greaterThan(numeric.of(200)))
       .value();
 
     expect(greater).toBe(true);
@@ -59,14 +59,14 @@ describe("numeric", () => {
   });
 
   test("lowerThan", () => {
-    const lowerThan = stream
+    const lowerThan = chain
       .of(numeric.of(123))
-      .next(numeric.lowerThan(numeric.of(200)))
+      .and(numeric.lowerThan(numeric.of(200)))
       .value();
 
-    const notLowerThan = stream
+    const notLowerThan = chain
       .of(numeric.of(123))
-      .next(numeric.lowerThan(numeric.of(50)))
+      .and(numeric.lowerThan(numeric.of(50)))
       .value();
 
     expect(lowerThan).toBe(true);
@@ -74,19 +74,19 @@ describe("numeric", () => {
   });
 
   test("greaterOrEqualTo", () => {
-    const greater = stream
+    const greater = chain
       .of(numeric.of(123))
-      .next(numeric.greaterOrEqualTo(numeric.of(50)))
+      .and(numeric.greaterOrEqualTo(numeric.of(50)))
       .value();
 
-    const equal = stream
+    const equal = chain
       .of(numeric.of(123))
-      .next(numeric.greaterOrEqualTo(numeric.of(123)))
+      .and(numeric.greaterOrEqualTo(numeric.of(123)))
       .value();
 
-    const lower = stream
+    const lower = chain
       .of(numeric.of(123))
-      .next(numeric.greaterOrEqualTo(numeric.of(200)))
+      .and(numeric.greaterOrEqualTo(numeric.of(200)))
       .value();
 
     expect(greater).toBe(true);
@@ -95,19 +95,19 @@ describe("numeric", () => {
   });
 
   test("greaterOrEqualTo", () => {
-    const greater = stream
+    const greater = chain
       .of(numeric.of(123))
-      .next(numeric.lowerOrEqualTo(numeric.of(50)))
+      .and(numeric.lowerOrEqualTo(numeric.of(50)))
       .value();
 
-    const equal = stream
+    const equal = chain
       .of(numeric.of(123))
-      .next(numeric.lowerOrEqualTo(numeric.of(123)))
+      .and(numeric.lowerOrEqualTo(numeric.of(123)))
       .value();
 
-    const lower = stream
+    const lower = chain
       .of(numeric.of(123))
-      .next(numeric.lowerOrEqualTo(numeric.of(200)))
+      .and(numeric.lowerOrEqualTo(numeric.of(200)))
       .value();
 
     expect(greater).toBe(false);
@@ -116,18 +116,18 @@ describe("numeric", () => {
   });
 
   test("divisible", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(100))
-      .next(numeric.divisibleBy(numeric.of(2)))
+      .and(numeric.divisibleBy(numeric.of(2)))
       .value();
 
     expect(value).toBe(true);
   });
 
   test("add", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(123))
-      .next(numeric.add(numeric.of(123)))
+      .and(numeric.add(numeric.of(123)))
       .value()
       .value();
 
@@ -135,9 +135,9 @@ describe("numeric", () => {
   });
 
   test("subtract", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(123))
-      .next(numeric.subtract(numeric.of(123)))
+      .and(numeric.subtract(numeric.of(123)))
       .value()
       .value();
 
@@ -146,9 +146,9 @@ describe("numeric", () => {
 
   test("subtract", () => {
 
-    const value = stream
+    const value = chain
       .of(numeric.of(123))
-      .next(numeric.multiply(numeric.of(2)))
+      .and(numeric.multiply(numeric.of(2)))
       .value()
       .value();
 
@@ -156,16 +156,16 @@ describe("numeric", () => {
   });
 
   test("divide", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(200))
-      .next(numeric.divide(numeric.of(2)))
-      .next(maybe.or(numeric.of(0)))
+      .and(numeric.divide(numeric.of(2)))
+      .and(maybe.or(numeric.of(0)))
       .value()
       .value();
 
-    const nothing = stream
+    const nothing = chain
       .of(numeric.of(200))
-      .next(numeric.divide(numeric.of(0)))
+      .and(numeric.divide(numeric.of(0)))
       .value()
       .or(numeric.of(0))
       .value();
@@ -175,18 +175,18 @@ describe("numeric", () => {
   });
 
   test("toPower", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(2))
-      .next(numeric.toPower(numeric.of(8)))
+      .and(numeric.toPower(numeric.of(8)))
       .value();
 
     expect(value).toStrictEqual(256);
   });
 
   test("max", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(10))
-      .next(numeric.maximum(numeric.of(5), numeric.of(6)))
+      .and(numeric.maximum(numeric.of(5), numeric.of(6)))
       .value()
       .value();
 
@@ -194,9 +194,9 @@ describe("numeric", () => {
   });
 
   test("min", () => {
-    const value = stream
+    const value = chain
       .of(numeric.of(10))
-      .next(numeric.minimum(numeric.of(5), numeric.of(6)))
+      .and(numeric.minimum(numeric.of(5), numeric.of(6)))
       .value()
       .value();
 
@@ -204,19 +204,19 @@ describe("numeric", () => {
   });
 
   test("compare", () => {
-    const greater = stream
+    const greater = chain
       .of(numeric.of(10))
-      .next(numeric.compare(numeric.of(5)))
+      .and(numeric.compare(numeric.of(5)))
       .value();
 
-    const lower = stream
+    const lower = chain
       .of(numeric.of(10))
-      .next(numeric.compare(numeric.of(20)))
+      .and(numeric.compare(numeric.of(20)))
       .value();
 
-    const equal = stream
+    const equal = chain
       .of(numeric.of(10))
-      .next(numeric.compare(numeric.of(10)))
+      .and(numeric.compare(numeric.of(10)))
       .value();
 
     expect(greater).toStrictEqual(numeric.Comparison.Greater);

@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import * as future from "./future";
-import * as stream from "./stream";
+import * as chain from "./chain";
 
 describe("future", () => {
   test("UnexpectedIssue", () => {
@@ -60,11 +60,11 @@ describe("future", () => {
   });
 
   test("update", () => {
-    stream
+    chain
       .of(future.of<number, never>((succeed) => {
         succeed(123);
       }))
-      .next(future.update(value => value * 2))
+      .and(future.update(value => value * 2))
       .value()
       .when(
         value => {
@@ -75,11 +75,11 @@ describe("future", () => {
         }
       );
 
-    stream
+    chain
       .of(future.of<number, never>(() => {
         throw new Error("Error");
       }))
-      .next(future.update(value => value * 2))
+      .and(future.update(value => value * 2))
       .value()
       .when(
         value => {
@@ -92,9 +92,9 @@ describe("future", () => {
   });
 
   test("upgrade", () => {
-    stream
+    chain
       .of(future.of<number>((succeed) => succeed(123)))
-      .next(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
+      .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
       .value()
       .when(
         value => {
@@ -105,11 +105,11 @@ describe("future", () => {
         }
       );
 
-    stream
+    chain
       .of(future.of<number>(() => {
         throw new Error("Error");
       }))
-      .next(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
+      .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
       .value()
       .when(
         value => {
@@ -120,9 +120,9 @@ describe("future", () => {
         }
       );
 
-    stream
+    chain
       .of(future.of<number>((succeed) => succeed(123)))
-      .next(future.upgrade(() => future.of<number>(() => {
+      .and(future.upgrade(() => future.of<number>(() => {
         throw new Error("Error");
       })))
       .value()

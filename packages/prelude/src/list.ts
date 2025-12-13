@@ -257,21 +257,17 @@ export const takeUntil = <Value>(condition: (value: Value) => boolean) => {
   };
 };
 
-export const zip = <Value>(other: List<Value>) => {
-  return (list: List<Value>): List<Value> => {
+export const zip = <Value, OtherValue>(other: List<OtherValue>) => {
+  return (list: List<Value>): List<[Value, OtherValue]> => {
     const arrayList = list.value();
-    const [first, ...remainingValues] = arrayList;
+    const otherArrayList = other.value();
+    const length = Math.min(arrayList.length, otherArrayList.length);
+    const result: [Value, OtherValue][] = [];
 
-    if (!first) {
-      return of(...arrayList);
+    for (let i = 0; i < length; i++) {
+      result.push([arrayList[i]!, otherArrayList[i]!]); // Using non-null assertion operator
     }
 
-    const [second, ...remainingOthers] = other.value();
-
-    if (!second) {
-      return of(first, ...remainingValues);
-    }
-
-    return of(first, second, ...zip(of(...remainingOthers))(of(...remainingValues)).value());
+    return of(...result);
   };
 }

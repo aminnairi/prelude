@@ -1,5 +1,5 @@
 import * as list from "./list";
-import * as stream from "./stream";
+import * as chain from "./chain";
 import * as text from "./text";
 import { test, expect, vi } from "vitest";
 
@@ -10,15 +10,15 @@ test("toArray", () => {
 });
 
 test("first", () => {
-  const emptyList = stream
+  const emptyList = chain
     .of(list.of<number>())
-    .next(list.first())
+    .and(list.first())
     .value()
     .or(0);
 
-  const filledList = stream
+  const filledList = chain
     .of(list.of(1, 2, 3))
-    .next(list.first())
+    .and(list.first())
     .value()
     .or(0);
 
@@ -27,15 +27,15 @@ test("first", () => {
 });
 
 test("last", () => {
-  const emptyList = stream
+  const emptyList = chain
     .of(list.of<number>())
-    .next(list.last())
+    .and(list.last())
     .value()
     .or(0);
 
-  const filledList = stream
+  const filledList = chain
     .of(list.of(1, 2, 3))
-    .next(list.last())
+    .and(list.last())
     .value()
     .or(0);
 
@@ -44,15 +44,15 @@ test("last", () => {
 });
 
 test("at", () => {
-  const emptyList = stream
+  const emptyList = chain
     .of(list.of<number>())
-    .next(list.at(1))
+    .and(list.at(1))
     .value()
     .or(0);
 
-  const filledList = stream
+  const filledList = chain
     .of(list.of(1, 2, 3))
-    .next(list.at(1))
+    .and(list.at(1))
     .value()
     .or(0);
 
@@ -61,9 +61,9 @@ test("at", () => {
 });
 
 test("keep", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.keep(value => value % 2 === 0))
+    .and(list.keep(value => value % 2 === 0))
     .value()
     .value();
 
@@ -71,9 +71,9 @@ test("keep", () => {
 });
 
 test("remove", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.remove(value => value % 2 !== 0))
+    .and(list.remove(value => value % 2 !== 0))
     .value()
     .value();
 
@@ -81,18 +81,18 @@ test("remove", () => {
 });
 
 test("count", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3))
-    .next(list.count())
+    .and(list.count())
     .value();
 
   expect(result).toStrictEqual(3);
 });
 
 test("update", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3))
-    .next(list.update(value => value * 2))
+    .and(list.update(value => value * 2))
     .value()
     .value();
 
@@ -100,14 +100,14 @@ test("update", () => {
 });
 
 test("any", () => {
-  const firstResult = stream
+  const firstResult = chain
     .of(list.of(1, 2, 3))
-    .next(list.any(value => value > 0))
+    .and(list.any(value => value > 0))
     .value();
 
-  const secondResult = stream
+  const secondResult = chain
     .of(list.of(1, 2, 3))
-    .next(list.any(value => value > 5))
+    .and(list.any(value => value > 5))
     .value();
 
   expect(firstResult).toBe(true);
@@ -115,14 +115,14 @@ test("any", () => {
 });
 
 test("all", () => {
-  const firstResult = stream
+  const firstResult = chain
     .of(list.of(1, 2, 3))
-    .next(list.all(value => value > 0))
+    .and(list.all(value => value > 0))
     .value();
 
-  const secondResult = stream
+  const secondResult = chain
     .of(list.of(1, 2, 3))
-    .next(list.all(value => value > 5))
+    .and(list.all(value => value > 5))
     .value();
 
   expect(firstResult).toBe(true);
@@ -130,15 +130,15 @@ test("all", () => {
 });
 
 test("find", () => {
-  const found = stream
+  const found = chain
     .of(list.of(1, 2, 3))
-    .next(list.find(value => value === 2))
+    .and(list.find(value => value === 2))
     .value()
     .or(0);
 
-  const notFound = stream
+  const notFound = chain
     .of(list.of(1, 2, 3))
-    .next(list.find(value => value === 5))
+    .and(list.find(value => value === 5))
     .value()
     .or(0);
 
@@ -147,15 +147,15 @@ test("find", () => {
 });
 
 test("position", () => {
-  const found = stream
+  const found = chain
     .of(list.of(1, 2, 3))
-    .next(list.position(value => value === 2))
+    .and(list.position(value => value === 2))
     .value()
     .or(-1);
 
-  const notFound = stream
+  const notFound = chain
     .of(list.of(1, 2, 3))
-    .next(list.position(value => value === 5))
+    .and(list.position(value => value === 5))
     .value()
     .or(-1);
 
@@ -164,15 +164,15 @@ test("position", () => {
 });
 
 test("updateAt", () => {
-  const resultWithUpdate = stream
+  const resultWithUpdate = chain
     .of(list.of(1, 2, 3))
-    .next(list.updateAt(1, value => value * 2))
+    .and(list.updateAt(1, value => value * 2))
     .value()
     .value();
 
-  const resultWithoutUpdate = stream
+  const resultWithoutUpdate = chain
     .of(list.of(1, 2, 3))
-    .next(list.updateAt(5, value => value * 2))
+    .and(list.updateAt(5, value => value * 2))
     .value()
     .value();
 
@@ -181,9 +181,9 @@ test("updateAt", () => {
 });
 
 test("append", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3))
-    .next(list.append(4, 5, 6))
+    .and(list.append(4, 5, 6))
     .value()
     .value();
 
@@ -191,9 +191,9 @@ test("append", () => {
 });
 
 test("removeAt", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3))
-    .next(list.removeAt(2))
+    .and(list.removeAt(2))
     .value()
     .value();
 
@@ -201,9 +201,9 @@ test("removeAt", () => {
 });
 
 test("enumerate", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3))
-    .next(list.enumerate())
+    .and(list.enumerate())
     .value()
     .value();
 
@@ -213,25 +213,25 @@ test("enumerate", () => {
 test("each", () => {
   const effect = vi.fn();
 
-  stream
+  chain
     .of(list.of(1, 2, 3))
-    .next(list.each(effect));
+    .and(list.each(effect));
 
   expect(effect).toHaveBeenCalledTimes(3);
 });
 
 test("sort", () => {
   const original = list.of(3, 1, 2);
-  const sorted = stream.of(original).next(list.sort()).value().value();
+  const sorted = chain.of(original).and(list.sort()).value().value();
 
   expect(original.value()).toStrictEqual([3, 1, 2]);
   expect(sorted).toStrictEqual([1, 2, 3]);
 });
 
 test("indices", () => {
-  const result = stream
+  const result = chain
     .of(list.of(9, 8, 7))
-    .next(list.indices())
+    .and(list.indices())
     .value()
     .value();
 
@@ -239,15 +239,15 @@ test("indices", () => {
 });
 
 test("has", () => {
-  const resultFound = stream
+  const resultFound = chain
     .of(list.of(1, 2, 3))
-    .next(list.has((value) => value === 2))
+    .and(list.has((value) => value === 2))
     .value();
 
 
-  const resultNotFound = stream
+  const resultNotFound = chain
     .of(list.of(1, 2, 3))
-    .next(list.has((value) => value === 5))
+    .and(list.has((value) => value === 5))
     .value();
 
   expect(resultFound).toBe(true);
@@ -255,9 +255,9 @@ test("has", () => {
 });
 
 test("join", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3))
-    .next(list.join(text.of("-")))
+    .and(list.join(text.of("-")))
     .value()
     .value();
 
@@ -265,9 +265,9 @@ test("join", () => {
 });
 
 test("drop", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.drop(2))
+    .and(list.drop(2))
     .value()
     .value();
 
@@ -275,9 +275,9 @@ test("drop", () => {
 });
 
 test("dropLast", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.dropLast(2))
+    .and(list.dropLast(2))
     .value()
     .value();
 
@@ -285,15 +285,15 @@ test("dropLast", () => {
 });
 
 test("dropUntil", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.dropUntil(value => value < 3))
+    .and(list.dropUntil(value => value < 3))
     .value()
     .value();
 
-  const emptyResult = stream
+  const emptyResult = chain
     .of(list.of())
-    .next(list.dropUntil(value => value < 3))
+    .and(list.dropUntil(value => value < 3))
     .value()
     .value();
 
@@ -302,9 +302,9 @@ test("dropUntil", () => {
 });
 
 test("take", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.take(3))
+    .and(list.take(3))
     .value()
     .value();
 
@@ -312,9 +312,9 @@ test("take", () => {
 });
 
 test("takeLast", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.takeLast(3))
+    .and(list.takeLast(3))
     .value()
     .value();
 
@@ -322,15 +322,15 @@ test("takeLast", () => {
 });
 
 test("takeUntil", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 2, 3, 4, 5))
-    .next(list.takeUntil((value) => value > 3))
+    .and(list.takeUntil((value) => value > 3))
     .value()
     .value();
 
-  const emptyResult = stream
+  const emptyResult = chain
     .of(list.of())
-    .next(list.takeUntil(value => value > 3))
+    .and(list.takeUntil(value => value > 3))
     .value()
     .value();
 
@@ -339,18 +339,18 @@ test("takeUntil", () => {
 });
 
 test("zip", () => {
-  const result = stream
+  const result = chain
     .of(list.of(1, 3, 5))
-    .next(list.zip(list.of(2, 4, 6)))
+    .and(list.zip(list.of(2, 4, 6)))
     .value()
     .value();
 
-  const emptyListResult = stream
+  const emptyListResult = chain
     .of(list.of(1, 2, 3))
-    .next(list.zip(list.of()))
+    .and(list.zip(list.of()))
     .value()
     .value();
 
-  expect(result).toStrictEqual([1, 2, 3, 4, 5, 6]);
-  expect(emptyListResult).toStrictEqual([1, 2, 3]);
+  expect(result).toStrictEqual([[1, 2], [3, 4], [5, 6]]);
+  expect(emptyListResult).toStrictEqual([]);
 });

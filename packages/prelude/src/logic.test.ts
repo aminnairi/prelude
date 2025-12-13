@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import * as logic from "./logic";
-import * as stream from "./stream";
+import * as chain from "./chain";
 
 describe("basics", () => {
   test("not", () => {
@@ -17,12 +17,12 @@ describe("basics", () => {
     const hasUppercase = (password: string) => /[A-Z]/.test(password);
     const hasSymbols = (password: string) => /[^a-zA-Z0-9]/.test(password);
 
-    const isRobustPassword = stream
+    const isRobustPassword = chain
       .of(isEightCharacters)
-      .next(logic.and(hasNumber))
-      .next(logic.and(hasLowercase))
-      .next(logic.and(hasUppercase))
-      .next(logic.and(hasSymbols))
+      .and(logic.and(hasNumber))
+      .and(logic.and(hasLowercase))
+      .and(logic.and(hasUppercase))
+      .and(logic.and(hasSymbols))
       .value();
 
     expect(isRobustPassword("Password123!@#")).toBe(true);
@@ -36,10 +36,10 @@ describe("basics", () => {
     const isCar = (vehicle: string) => vehicle === "car";
     const isBicycle = (vehicle: string) => vehicle === "bicycle";
 
-    const isLandVehicle = stream
+    const isLandVehicle = chain
       .of(isMotorcycle)
-      .next(logic.or(isCar))
-      .next(logic.or(isBicycle))
+      .and(logic.or(isCar))
+      .and(logic.or(isBicycle))
       .value();
 
 
@@ -52,10 +52,10 @@ describe("basics", () => {
     const numbers = (chars: string[]) => chars.map(character => parseInt(character));
     const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
-    const charactersToNumbers = stream
+    const charactersToNumbers = chain
       .of(characters)
-      .next(logic.pipe(numbers))
-      .next(logic.pipe(sum))
+      .and(logic.pipe(numbers))
+      .and(logic.pipe(sum))
       .value();
 
     expect(charactersToNumbers("12345")).toBe(15);

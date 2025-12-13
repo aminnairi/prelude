@@ -1,10 +1,10 @@
 import { describe, test, expect } from "vitest";
 import * as text from "./text";
-import * as stream from "./stream";
+import * as chain from "./chain";
 
 describe("text", () => {
   test("value", () => {
-    const result = stream
+    const result = chain
       .of(text.of("Hello"))
       .value()
       .value();
@@ -13,18 +13,18 @@ describe("text", () => {
   });
 
   test("count", () => {
-    const result = stream
+    const result = chain
       .of(text.of("Hello"))
-      .next(text.count())
+      .and(text.count())
       .value();
 
     expect(result).toBe(5);
   });
 
   test("concatenate", () => {
-    const result = stream
+    const result = chain
       .of(text.of("Hello, "))
-      .next(text.concatenate(text.of("world!")))
+      .and(text.concatenate(text.of("world!")))
       .value()
       .value();
 
@@ -32,9 +32,9 @@ describe("text", () => {
   });
 
   test("updateAll", () => {
-    const result = stream
+    const result = chain
       .of(text.of("hello"))
-      .next(text.updateAll(character => text.of(character.value().toUpperCase())))
+      .and(text.updateAll(character => text.of(character.value().toUpperCase())))
       .value()
       .value();
 
@@ -42,9 +42,9 @@ describe("text", () => {
   });
 
   test("updateAt", () => {
-    const result = stream
+    const result = chain
       .of(text.of("hello"))
-      .next(text.updateAt(1, character => text.of(character.value().toUpperCase())))
+      .and(text.updateAt(1, character => text.of(character.value().toUpperCase())))
       .value()
       .value();
 
