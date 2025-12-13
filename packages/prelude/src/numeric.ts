@@ -66,9 +66,9 @@ export const divisibleBy = (divider: number) => {
   };
 };
 
-export const add = (second: number) => {
-  return (first: number) => {
-    return first + second;
+export const add = (...seconds: number[]) => {
+  return (...firsts: number[]) => {
+    return [...firsts, ...seconds].reduce((sum, current) => sum + current, 0);
   };
 };
 
