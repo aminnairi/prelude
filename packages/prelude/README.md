@@ -151,6 +151,36 @@ console.log(result);
 
 The `text` module provides functions for immutable string manipulation using a functional approach.
 
+#### from
+
+Converts an unknown input to its string representation.
+
+##### Signature
+
+```typescript
+function from(input: unknown): string
+```
+
+##### Example
+
+```typescript
+import { chain, text } from "@aminnairi/prelude";
+
+const numToString = chain.of(123)
+  .and(text.from)
+  .value();
+
+console.log(numToString);
+// => "123"
+
+const boolToString = chain.of(true)
+  .and(text.from)
+  .value();
+
+console.log(boolToString);
+// => "true"
+```
+
 #### count
 
 Returns the number of characters in a string.
@@ -243,9 +273,160 @@ console.log(modifiedText);
 // => "hello"
 ```
 
+#### lines
+
+Splits a string into an array of lines based on the newline character.
+
+##### Signature
+
+```typescript
+function lines(): (text: string) => Array<string>
+```
+
+##### Example
+
+```typescript
+import { chain, text } from "@aminnairi/prelude";
+
+const multilineText = "Line 1\\nLine 2\\nLine 3";
+const textLines = chain.of(multilineText)
+  .and(text.lines())
+  .value();
+
+console.log(textLines);
+// => ["Line 1", "Line 2", "Line 3"]
+```
+
+#### split
+
+Splits a string into an array of substrings using the specified `separator`.
+
+##### Signature
+
+```typescript
+function split(separator: string): (text: string) => Array<string>
+```
+
+##### Example
+
+```typescript
+import { chain, text } from "@aminnairi/prelude";
+
+const commaSeparated = "apple,banana,orange";
+const fruits = chain.of(commaSeparated)
+  .and(text.split(","))
+  .value();
+
+console.log(fruits);
+// => ["apple", "banana", "orange"]
+```
+
+#### toInteger
+
+Converts a string to an integer. Returns a `Maybe<number>` to handle invalid number strings.
+
+##### Signature
+
+```typescript
+function toInteger(): (text: string) => maybe.Maybe<number>
+```
+
+##### Example
+
+```typescript
+import { chain, text, maybe } from "@aminnairi/prelude";
+
+const intString = "123";
+const parsedInt = chain.of(intString)
+  .and(text.toInteger())
+  .and(maybe.or(0))
+  .value();
+
+console.log(parsedInt);
+// => 123
+
+const nonIntString = "abc";
+const notParsedInt = chain.of(nonIntString)
+  .and(text.toInteger())
+  .and(maybe.or(0))
+  .value();
+
+console.log(notParsedInt);
+// => 0
+```
+
+#### prefix
+
+Adds a `prefix` string to the beginning of the current string.
+
+##### Signature
+
+```typescript
+function prefix(prefix: string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { chain, text } from "@aminnairi/prelude";
+
+const prefixedText = chain.of("world")
+  .and(text.prefix("Hello, "))
+  .value();
+
+console.log(prefixedText);
+// => "Hello, world"
+```
+
+#### suffix
+
+Adds a `suffix` string to the end of the current string.
+
+##### Signature
+
+```typescript
+function suffix(suffix: string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { chain, text } from "@aminnairi/prelude";
+
+const suffixedText = chain.of("Hello")
+  .and(text.suffix(" World!"))
+  .value();
+
+console.log(suffixedText);
+// => "Hello World!"
+```
+
 ### list
 
 The `list` module provides functions for working with immutable lists, offering a functional approach to common array operations.
+
+#### of
+
+Creates a new `Array` instance from the provided values.
+
+##### Signature
+
+```typescript
+function of<Value = never>(...values: Value[]): Array<Value>
+```
+
+##### Example
+
+```typescript
+import { chain, list } from "@aminnairi/prelude";
+
+const newlist = chain.of(1)
+  .and(list.of(2, 3, 4))
+  .value();
+
+console.log(newlist);
+// => [2, 3, 4]
+```
 
 #### keep
 
@@ -404,18 +585,24 @@ function first<Value>(): (list: Array<Value>) => maybe.Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, list } from "@aminnairi/prelude";
+import { chain, list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30];
-const firstNumber = list.first()(numbers);
+const firstNumber = chain.of(numbers)
+  .and(list.first())
+  .and(maybe.or(0))
+  .value();
 
-console.log(firstNumber.or(0));
+console.log(firstNumber);
 // => 10
 
 const emptyList = [];
-const noNumber = list.first()(emptyList);
+const noNumber = chain.of(emptyList)
+  .and(list.first())
+  .and(maybe.or(0))
+  .value();
 
-console.log(noNumber.or(0));
+console.log(noNumber);
 // => 0
 ```
 
@@ -432,18 +619,24 @@ function last<Value>(): (list: Array<Value>) => maybe.Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, list } from "@aminnairi/prelude";
+import { chain, list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30];
-const lastNumber = list.last()(numbers);
+const lastNumber = chain.of(numbers)
+  .and(list.last())
+  .and(maybe.or(0))
+  .value();
 
-console.log(lastNumber.or(0));
+console.log(lastNumber);
 // => 30
 
 const emptyList = [];
-const noNumber = list.last()(emptyList);
+const noNumber = chain.of(emptyList)
+  .and(list.last())
+  .and(maybe.or(0))
+  .value();
 
-console.log(noNumber.or(0));
+console.log(noNumber);
 // => 0
 ```
 
@@ -460,17 +653,23 @@ function at<Value>(index: number): (list: Array<Value>) => maybe.Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, list } from "@aminnairi/prelude";
+import { chain, list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30];
-const numberAtOne = list.at(1)(numbers);
+const numberAtOne = chain.of(numbers)
+  .and(list.at(1))
+  .and(maybe.or(0))
+  .value();
 
-console.log(numberAtOne.or(0));
+console.log(numberAtOne);
 // => 20
 
-const numberAtFive = list.at(5)(numbers);
+const numberAtFive = chain.of(numbers)
+  .and(list.at(5))
+  .and(maybe.or(0))
+  .value();
 
-console.log(numberAtFive.or(0));
+console.log(numberAtFive);
 // => 0
 ```
 
@@ -567,17 +766,23 @@ function find<Value>(accept: (value: Value) => boolean): (list: Array<Value>) =>
 ##### Example
 
 ```typescript
-import { chain, list } from "@aminnairi/prelude";
+import { chain, list, maybe } from "@aminnairi/prelude";
 
 const numbers = [1, 2, 3, 4, 5];
-const firstEven = list.find(n => n % 2 === 0)(numbers);
+const firstEven = chain.of(numbers)
+  .and(list.find(n => n % 2 === 0))
+  .and(maybe.or(0))
+  .value();
 
-console.log(firstEven.or(0));
+console.log(firstEven);
 // => 2
 
-const notFound = list.find(n => n > 10)(numbers);
+const notFound = chain.of(numbers)
+  .and(list.find(n => n > 10))
+  .and(maybe.or(0))
+  .value();
 
-console.log(notFound.or(0));
+console.log(notFound);
 // => 0
 ```
 
@@ -594,17 +799,23 @@ function position<Value>(is: (value: Value) => boolean): (list: Array<Value>) =>
 ##### Example
 
 ```typescript
-import { chain, list } from "@aminnairi/prelude";
+import { chain, list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30, 20];
-const indexOf20 = list.position(n => n === 20)(numbers);
+const indexOf20 = chain.of(numbers)
+  .and(list.position(n => n === 20))
+  .and(maybe.or(-1))
+  .value();
 
-console.log(indexOf20.or(-1));
+console.log(indexOf20);
 // => 1
 
-const indexOf40 = list.position(n => n === 40)(numbers);
+const indexOf40 = chain.of(numbers)
+  .and(list.position(n => n === 40))
+  .and(maybe.or(-1))
+  .value();
 
-console.log(indexOf40.or(-1));
+console.log(indexOf40);
 // => -1
 ```
 
@@ -927,9 +1138,65 @@ console.log(zippedList);
 // => [[1, "a"], [2, "b"], [3, "c"]]
 ```
 
+#### upgrade
+
+Reduces a list to a single value by applying a reducer function to each element.
+
+##### Signature
+
+```typescript
+function upgrade<Value, NewValue>(value: NewValue, reducer: (previous: NewValue, current: Value) => NewValue): (list: Array<Value>) => NewValue
+```
+
+##### Example
+
+```typescript
+import { chain, list } from "@aminnairi/prelude";
+
+const sum = chain.of([1, 2, 3, 4, 5])
+  .and(list.upgrade(0, (total, num) => total + num))
+  .value();
+
+console.log(sum);
+// => 15
+```
+
 ### future
 
 The `future` module provides a way to represent asynchronous operations that may succeed with a value or fail with an issue, similar to Promises but with a functional approach.
+
+#### UnexpectedIssue
+
+Represents an unexpected error that occurred within a `Future` operation, typically from synchronous exceptions.
+
+##### Signature
+
+```typescript
+class UnexpectedIssue extends Error {
+  readonly name: "UnexpectedIssue";
+  constructor(error: unknown);
+}
+```
+
+##### Example
+
+```typescript
+import { chain, future } from "@aminnairi/prelude";
+
+const throwingFuture = future.of(() => {
+  throw new Error("Something unexpected happened");
+});
+
+throwingFuture.when(
+  value => console.log(value),
+  issue => {
+    if (issue instanceof future.UnexpectedIssue) {
+      console.error("Unexpected Error Caught:", issue.error);
+    }
+  }
+);
+// => Unexpected Error Caught: Error: Something unexpected happened
+```
 
 #### of
 
@@ -1067,9 +1334,190 @@ userProfile.when(
 // => Data for 123
 ```
 
-### numeric
+#### when
 
-The `numeric` module provides functions for performing immutable numeric operations and comparisons using a functional approach.
+Executes `success` callback if the `Future` succeeds, or `failure` callback if it fails. Returns the original `Future` (for chaining).
+
+##### Signature
+
+```typescript
+function when<Value, Issue>(success: (value: Value) => void, failure: (issue: Issue | UnexpectedIssue) => void): (future: Future<Value, Issue>) => Future<Value, Issue>
+```
+
+##### Example
+
+```typescript
+import { chain, future } from "@aminnairi/prelude";
+
+const myFuture = future.succeed("Hello");
+
+chain.of(myFuture)
+  .and(future.when(
+    value => console.log("Success:", value),
+    error => console.error("Failure:", error)
+  ));
+// => Success: Hello
+```
+
+### pattern
+
+The `pattern` module provides utility functions for working with regular expressions in a functional manner.
+
+#### test
+
+Tests whether a string matches a given regular expression pattern.
+
+##### Signature
+
+```typescript
+function test(pattern: RegExp): (input: string) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, pattern } from "@aminnairi/prelude";
+
+const hasNumber = chain.of("hello123world")
+  .and(pattern.test(/\d+/))
+  .value();
+
+console.log(hasNumber);
+// => true
+
+const hasNoNumber = chain.of("helloworld")
+  .and(pattern.test(/\d+/))
+  .value();
+
+console.log(hasNoNumber);
+// => false
+```
+
+### http
+
+The `http` module provides functions for making HTTP requests and handling responses in a functional way, utilizing the `Future` and `Maybe` modules for asynchronous operations and optional values.
+
+#### HttpError
+
+Represents an error that occurred during an HTTP request.
+
+##### Signature
+
+```typescript
+class HttpError extends Error {
+  readonly name: "HttpError";
+  constructor(error: unknown);
+}
+```
+
+##### Example
+
+```typescript
+import { chain, future, http } from "@aminnairi/prelude";
+
+chain.of("https://invalid.url")
+  .and(http.get)
+  .value()
+  .when(
+    value => console.log("Success:", value),
+    issue => {
+      if (issue instanceof http.HttpError) {
+        console.error("HTTP Error:", issue.error);
+      } else {
+        console.error("Unexpected Error:", issue);
+      }
+    }
+  );
+// => HTTP Error: ... (fetch error)
+```
+
+#### JsonError
+
+Represents an error that occurred during JSON parsing of an HTTP response.
+
+##### Signature
+
+```typescript
+class JsonError extends Error {
+  readonly name: "JsonError";
+  constructor(error: Error);
+}
+```
+
+##### Example
+
+```typescript
+import { chain, future, http } from "@aminnairi/prelude";
+
+// Assuming a response that is not valid JSON
+const invalidJsonResponse = new Response("not json", { status: 200 });
+
+chain.of(invalidJsonResponse)
+  .and(http.json)
+  .value()
+  .when(
+    value => console.log("Success:", value),
+    issue => {
+      if (issue instanceof http.JsonError) {
+        console.error("JSON Error:", issue.error.message);
+      } else {
+        console.error("Unexpected Error:", issue);
+      }
+    }
+  );
+// => JSON Error: SyntaxError: Unexpected token 'o', "not json" is not valid JSON
+```
+
+#### get
+
+Sends an HTTP GET request to the specified URL.
+
+##### Signature
+
+```typescript
+function get(url: string, options?: RequestInit): Future<Response, HttpError | future.UnexpectedIssue>
+```
+
+##### Example
+
+```typescript
+import { chain, future, http } from "@aminnairi/prelude";
+
+chain.of("https://jsonplaceholder.typicode.com/todos/1")
+  .and(http.get)
+  .value()
+  .when(
+    response => console.log("Status:", response.status),
+    issue => console.error("Error:", issue)
+  );
+// => Status: 200
+```
+
+#### json
+
+Parses the body of an HTTP Response as JSON.
+
+##### Signature
+
+```typescript
+function json(response: Response): Future<JSON, JsonError | future.UnexpectedIssue>
+```
+
+##### Example
+
+```typescript
+import { chain, future, http } from "@aminnairi/prelude";
+
+chain.of("https://jsonplaceholder.typicode.com/todos/1")
+  .and(http.get)
+  .and(future.upgrade(http.json))
+  .value()
+  .when(
+    data => console.log("Data:", data),
+    issue => console.error("Error:", issue)
+  );
+// => Data: { userId: 1, id: 1, title: 'delectus aut autem', completed: false }
+
 
 #### between
 
@@ -1466,9 +1914,420 @@ console.log(comparisonResult === numeric.Comparison.Greater);
 // => true
 ```
 
-### logic
+### numeric
 
-The `logic` module provides higher-order functions for composing and transforming boolean logic and function pipelines.
+The `numeric` module provides functions for performing immutable numeric operations and comparisons using a functional approach.
+
+#### Comparison
+
+An enumeration representing the result of a comparison between two numbers.
+
+##### Signature
+
+```typescript
+enum Comparison {
+  Greater,
+  Lower,
+  Equal,
+}
+```
+
+#### between
+
+Checks if a number is inclusively between a `lowerbound` and an `upperbound`.
+
+##### Signature
+
+```typescript
+function between(lowerbound: number, upperbound: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isBetween = chain.of(5)
+  .and(numeric.between(1, 10))
+  .value();
+
+console.log(isBetween);
+// => true
+
+const isNotBetween = chain.of(15)
+  .and(numeric.between(1, 10))
+  .value();
+
+console.log(isNotBetween);
+// => false
+```
+
+#### equalTo
+
+Checks if a number is equal to another number.
+
+##### Signature
+
+```typescript
+function equalTo(other: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isEqual = chain.of(5)
+  .and(numeric.equalTo(5))
+  .value();
+
+console.log(isEqual);
+// => true
+```
+
+#### differentThan
+
+Checks if a number is different from another number.
+
+##### Signature
+
+```typescript
+function differentThan(other: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isDifferent = chain.of(5)
+  .and(numeric.differentThan(10))
+  .value();
+
+console.log(isDifferent);
+// => true
+```
+
+#### greaterThan
+
+Checks if a number is greater than another number.
+
+##### Signature
+
+```typescript
+function greaterThan(other: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isGreater = chain.of(10)
+  .and(numeric.greaterThan(5))
+  .value();
+
+console.log(isGreater);
+// => true
+```
+
+#### lowerThan
+
+Checks if a number is lower than another number.
+
+##### Signature
+
+```typescript
+function lowerThan(other: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isLower = chain.of(5)
+  .and(numeric.lowerThan(10))
+  .value();
+
+console.log(isLower);
+// => true
+```
+
+#### greaterOrEqualTo
+
+Checks if a number is greater than or equal to another number.
+
+##### Signature
+
+```typescript
+function greaterOrEqualTo(other: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isGreaterOrEqual = chain.of(10)
+  .and(numeric.greaterOrEqualTo(10))
+  .value();
+
+console.log(isGreaterOrEqual);
+// => true
+```
+
+#### lowerOrEqualTo
+
+Checks if a number is lower than or equal to another number.
+
+##### Signature
+
+```typescript
+function lowerOrEqualTo(other: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isLowerOrEqual = chain.of(5)
+  .and(numeric.lowerOrEqualTo(5))
+  .value();
+
+console.log(isLowerOrEqual);
+// => true
+```
+
+#### divisibleBy
+
+Checks if a number is divisible by another number.
+
+##### Signature
+
+```typescript
+function divisibleBy(divider: number): (numeric: number) => boolean
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const isDivisible = chain.of(10)
+  .and(numeric.divisibleBy(2))
+  .value();
+
+console.log(isDivisible);
+// => true
+```
+
+#### add
+
+Adds one or more numbers to an initial number.
+
+##### Signature
+
+```typescript
+function add(...seconds: number[]): (first: number) => number
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const sum = chain.of(5)
+  .and(numeric.add(3))
+  .value();
+
+console.log(sum);
+// => 8
+```
+
+##### Example with multiple numbers
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const total = chain.of(10)
+  .and(numeric.add(1, 2, 3)) // Adds 1, 2, and 3 to 10
+  .value();
+
+console.log(total);
+// => 16
+```
+
+#### subtract
+
+Subtracts the `second` number from the `first` number.
+
+##### Signature
+
+```typescript
+function subtract(second: number): (first: number) => number
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const difference = chain.of(10)
+  .and(numeric.subtract(4))
+  .value();
+
+console.log(difference);
+// => 6
+```
+
+#### multiply
+
+Multiplies two numbers.
+
+##### Signature
+
+```typescript
+function multiply(second: number): (first: number) => number
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const product = chain.of(6)
+  .and(numeric.multiply(7))
+  .value();
+
+console.log(product);
+// => 42
+```
+
+#### divide
+
+Divides the `first` number by the `second` number. Returns a `Maybe<number>` to handle division by zero.
+
+##### Signature
+
+```typescript
+function divide(second: number): (first: number) => maybe.Maybe<number>
+```
+
+##### Example
+
+```typescript
+import { chain, numeric, maybe } from "@aminnairi/prelude";
+
+const quotient = chain.of(10)
+  .and(numeric.divide(2))
+  .and(maybe.or(0))
+  .value();
+
+console.log(quotient);
+// => 5
+
+const divisionByZero = chain.of(10)
+  .and(numeric.divide(0))
+  .and(maybe.or(0))
+  .value();
+
+console.log(divisionByZero);
+// => 0
+```
+
+#### toPower
+
+Raises a number to the power of another number.
+
+##### Signature
+
+```typescript
+function toPower(power: number): (numeric: number) => number
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const result = chain.of(2)
+  .and(numeric.toPower(3))
+  .value();
+
+console.log(result);
+// => 8
+```
+
+#### maximum
+
+Returns the maximum of the given number and additional numbers.
+
+##### Signature
+
+```typescript
+function maximum(...numerics: number[]): (numeric: number) => number
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const maxNumber = chain.of(5)
+  .and(numeric.maximum(10, 2))
+  .value();
+
+console.log(maxNumber);
+// => 10
+```
+
+#### minimum
+
+Returns the minimum of the given number and additional numbers.
+
+##### Signature
+
+```typescript
+function minimum(...numerics: number[]): (numeric: number) => number
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const minNumber = chain.of(5)
+  .and(numeric.minimum(10, 2))
+  .value();
+
+console.log(minNumber);
+// => 2
+```
+
+#### compare
+
+Compares two numbers and returns a `Comparison` enum indicating whether the first is `Greater`, `Lower`, or `Equal` to the second.
+
+##### Signature
+
+```typescript
+function compare(second: number): (first: number) => Comparison
+```
+
+##### Example
+
+```typescript
+import { chain, numeric } from "@aminnairi/prelude";
+
+const comparisonResult = chain.of(10)
+  .and(numeric.compare(5))
+  .value();
+
+console.log(comparisonResult === numeric.Comparison.Greater);
+// => true
+
 
 #### not
 
