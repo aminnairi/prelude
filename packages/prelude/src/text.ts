@@ -1,5 +1,9 @@
 import * as maybe from "./maybe";
 
+export const from = (input: unknown) => {
+  return String(input);
+};
+
 export const count = () => {
   return (text: string) => {
     return text.length;
@@ -53,5 +57,17 @@ export const toInteger = () => {
     }
 
     return maybe.some(value);
+  };
+};
+
+export const prefix = (prefix: string) => {
+  return (text: string) => {
+    return `${prefix}${text}`;
+  };
+};
+
+export const suffix = (suffix: string) => {
+  return (text: string) => {
+    return `${text}${suffix}`;
   };
 };
