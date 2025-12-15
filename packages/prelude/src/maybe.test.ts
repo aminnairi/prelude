@@ -21,7 +21,7 @@ describe("or", () => {
   test("exported or with some", () => {
     const valueWithSome = chain.of(maybe.some(10))
       .and(maybe.or(5))
-      .value();
+      .link();
 
     expect(valueWithSome).toStrictEqual(10);
   });
@@ -29,7 +29,7 @@ describe("or", () => {
   test("exported or with none", () => {
     const valueWithNone = chain.of(maybe.none<number>())
       .and(maybe.or(5))
-      .value();
+      .link();
 
     expect(valueWithNone).toStrictEqual(5);
   });

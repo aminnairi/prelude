@@ -52,7 +52,7 @@ test("keep", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.keep(value => value % 2 === 0))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([2, 4]);
 });
@@ -61,7 +61,7 @@ test("remove", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.remove(value => value % 2 !== 0))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([2, 4]);
 });
@@ -70,7 +70,7 @@ test("count", () => {
   const result = chain
     .of([1, 2, 3])
     .and(list.count())
-    .value();
+    .link();
 
   expect(result).toStrictEqual(3);
 });
@@ -79,7 +79,7 @@ test("update", () => {
   const result = chain
     .of([1, 2, 3])
     .and(list.update(value => value * 2))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([2, 4, 6]);
 });
@@ -88,12 +88,12 @@ test("any", () => {
   const firstResult = chain
     .of([1, 2, 3])
     .and(list.any(value => value > 0))
-    .value();
+    .link();
 
   const secondResult = chain
     .of([1, 2, 3])
     .and(list.any(value => value > 5))
-    .value();
+    .link();
 
   expect(firstResult).toBe(true);
   expect(secondResult).toBe(false);
@@ -103,12 +103,12 @@ test("all", () => {
   const firstResult = chain
     .of([1, 2, 3])
     .and(list.all(value => value > 0))
-    .value();
+    .link();
 
   const secondResult = chain
     .of([1, 2, 3])
     .and(list.all(value => value > 5))
-    .value();
+    .link();
 
   expect(firstResult).toBe(true);
   expect(secondResult).toBe(false);
@@ -144,12 +144,12 @@ test("updateAt", () => {
   const resultWithUpdate = chain
     .of([1, 2, 3])
     .and(list.updateAt(1, value => value * 2))
-    .value();
+    .link();
 
   const resultWithoutUpdate = chain
     .of([1, 2, 3])
     .and(list.updateAt(5, value => value * 2))
-    .value();
+    .link();
 
   expect(resultWithUpdate).toStrictEqual([1, 4, 3]);
   expect(resultWithoutUpdate).toStrictEqual([1, 2, 3]);
@@ -159,7 +159,7 @@ test("append", () => {
   const result = chain
     .of([1, 2, 3])
     .and(list.append(4, 5, 6))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([1, 2, 3, 4, 5, 6]);
 });
@@ -168,7 +168,7 @@ test("removeAt", () => {
   const result = chain
     .of([1, 2, 3])
     .and(list.removeAt(2))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([1, 2]);
 });
@@ -177,7 +177,7 @@ test("enumerate", () => {
   const result = chain
     .of([1, 2, 3])
     .and(list.enumerate())
-    .value();
+    .link();
 
   expect(result).toStrictEqual([[0, 1], [1, 2], [2, 3]]);
 });
@@ -194,7 +194,7 @@ test("each", () => {
 
 test("sort", () => {
   const original = [3, 1, 2];
-  const sorted = chain.of(original).and(list.sort()).value();
+  const sorted = chain.of(original).and(list.sort()).link();
 
   expect(original).toStrictEqual([3, 1, 2]);
   expect(sorted).toStrictEqual([1, 2, 3]);
@@ -204,7 +204,7 @@ test("indices", () => {
   const result = chain
     .of([9, 8, 7])
     .and(list.indices())
-    .value();
+    .link();
 
   expect(result).toStrictEqual([0, 1, 2]);
 });
@@ -213,13 +213,13 @@ test("has", () => {
   const resultFound = chain
     .of([1, 2, 3])
     .and(list.has((value) => value === 2))
-    .value();
+    .link();
 
 
   const resultNotFound = chain
     .of([1, 2, 3])
     .and(list.has((value) => value === 5))
-    .value();
+    .link();
 
   expect(resultFound).toBe(true);
   expect(resultNotFound).toBe(false);
@@ -229,7 +229,7 @@ test("join", () => {
   const result = chain
     .of([1, 2, 3])
     .and(list.join("-"))
-    .value();
+    .link();
 
   expect(result).toStrictEqual("1-2-3");
 });
@@ -238,7 +238,7 @@ test("drop", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.drop(2))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([3, 4, 5]);
 });
@@ -247,7 +247,7 @@ test("dropLast", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.dropLast(2))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([1, 2, 3]);
 });
@@ -256,12 +256,12 @@ test("dropUntil", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.dropUntil(value => value < 3))
-    .value();
+    .link();
 
   const emptyResult = chain
     .of([])
     .and(list.dropUntil(value => value < 3))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([3, 4, 5]);
   expect(emptyResult).toStrictEqual([]);
@@ -271,7 +271,7 @@ test("take", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.take(3))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([1, 2, 3]);
 });
@@ -280,7 +280,7 @@ test("takeLast", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.takeLast(3))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([3, 4, 5]);
 });
@@ -289,12 +289,12 @@ test("takeUntil", () => {
   const result = chain
     .of([1, 2, 3, 4, 5])
     .and(list.takeUntil((value) => value > 3))
-    .value();
+    .link();
 
   const emptyResult = chain
     .of([])
     .and(list.takeUntil(value => value > 3))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([1, 2, 3]);
   expect(emptyResult).toStrictEqual([]);
@@ -304,12 +304,12 @@ test("zip", () => {
   const result = chain
     .of([1, 3, 5])
     .and(list.zip([2, 4, 6]))
-    .value();
+    .link();
 
   const emptyListResult = chain
     .of([1, 2, 3])
     .and(list.zip([]))
-    .value();
+    .link();
 
   expect(result).toStrictEqual([[1, 2], [3, 4], [5, 6]]);
   expect(emptyListResult).toStrictEqual([]);
@@ -319,7 +319,7 @@ test("upgrade", () => {
   const value = chain
     .of([1, 2, 3, 4, 5])
     .and(list.upgrade(0, (total, value) => total + value))
-    .value();
+    .link();
 
   expect(value).toStrictEqual(15);
 });

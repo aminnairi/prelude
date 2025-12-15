@@ -8,16 +8,16 @@ describe("text", () => {
     const bool = true;
     const obj = { a: 1 };
 
-    expect(chain.of(num).and(text.from).value()).toStrictEqual("123");
-    expect(chain.of(bool).and(text.from).value()).toStrictEqual("true");
-    expect(chain.of(obj).and(text.from).value()).toStrictEqual("[object Object]");
+    expect(chain.of(num).and(text.from).link()).toStrictEqual("123");
+    expect(chain.of(bool).and(text.from).link()).toStrictEqual("true");
+    expect(chain.of(obj).and(text.from).link()).toStrictEqual("[object Object]");
   });
 
   test("prefix", () => {
     const result = chain
       .of("world")
       .and(text.prefix("Hello, "))
-      .value();
+      .link();
 
     expect(result).toStrictEqual("Hello, world");
   });
@@ -26,7 +26,7 @@ describe("text", () => {
     const result = chain
       .of("Hello")
       .and(text.suffix(" World!"))
-      .value();
+      .link();
 
     expect(result).toStrictEqual("Hello World!");
   });
@@ -35,7 +35,7 @@ describe("text", () => {
     const result = chain
       .of("Hello")
       .and(text.count())
-      .value();
+      .link();
 
     expect(result).toBe(5);
   });
@@ -44,7 +44,7 @@ describe("text", () => {
     const result = chain
       .of("Hello, ")
       .and(text.concatenate("world!"))
-      .value();
+      .link();
 
     expect(result).toStrictEqual("Hello, world!");
   });
@@ -53,7 +53,7 @@ describe("text", () => {
     const result = chain
       .of("hello")
       .and(text.updateAll(character => character.toUpperCase()))
-      .value();
+      .link();
 
     expect(result).toStrictEqual("HELLO");
   });
@@ -62,7 +62,7 @@ describe("text", () => {
     const result = chain
       .of("hello")
       .and(text.updateAt(1, character => character.toUpperCase()))
-      .value();
+      .link();
 
     expect(result).toStrictEqual("hEllo");
   });
@@ -71,7 +71,7 @@ describe("text", () => {
     const multilineText = "Line 1\nLine 2\nLine 3";
     const result = chain.of(multilineText)
       .and(text.lines())
-      .value();
+      .link();
 
     expect(result).toStrictEqual(["Line 1", "Line 2", "Line 3"]);
   });
@@ -80,7 +80,7 @@ describe("text", () => {
     const commaSeparated = "apple,banana,orange";
     const result = chain.of(commaSeparated)
       .and(text.split(","))
-      .value();
+      .link();
 
     expect(result).toStrictEqual(["apple", "banana", "orange"]);
   });
@@ -89,7 +89,7 @@ describe("text", () => {
     const intString = "123";
     const result = chain.of(intString)
       .and(text.toInteger())
-      .value();
+      .link();
 
     expect(result.or(0)).toStrictEqual(123);
   });
@@ -98,7 +98,7 @@ describe("text", () => {
     const nonIntString = "abc";
     const result = chain.of(nonIntString)
       .and(text.toInteger())
-      .value();
+      .link();
 
     expect(result.or(0)).toStrictEqual(0);
   });

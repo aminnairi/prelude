@@ -30,7 +30,7 @@ describe("future", () => {
 
     chain.of(future.succeed(123))
       .and(future.when(successSpy, failureSpy))
-      .value();
+      .link();
 
     expect(successSpy).toHaveBeenCalledWith(123);
     expect(failureSpy).not.toHaveBeenCalled();
@@ -43,7 +43,7 @@ describe("future", () => {
 
     chain.of(future.fail(testError))
       .and(future.when(successSpy, failureSpy))
-      .value();
+      .link();
 
     expect(successSpy).not.toHaveBeenCalled();
     expect(failureSpy).toHaveBeenCalledWith(testError);
@@ -78,7 +78,7 @@ describe("future", () => {
         succeed(123);
       }))
       .and(future.update(value => value * 2))
-      .value()
+      .link()
       .when(
         value => {
           expect(value).toStrictEqual(246);
@@ -93,7 +93,7 @@ describe("future", () => {
         throw new Error("Error");
       }))
       .and(future.update(value => value * 2))
-      .value()
+      .link()
       .when(
         value => {
           expect.fail(`Unexpected value ${value}`);
@@ -108,7 +108,7 @@ describe("future", () => {
     chain
       .of(future.of<number>((succeed) => succeed(123)))
       .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
-      .value()
+      .link()
       .when(
         value => {
           expect(value).toStrictEqual(246);
@@ -123,7 +123,7 @@ describe("future", () => {
         throw new Error("Error");
       }))
       .and(future.upgrade(value => future.of<number>(succeed => succeed(value * 2))))
-      .value()
+      .link()
       .when(
         value => {
           expect.fail(`Unexpected value ${value}`);
@@ -138,7 +138,7 @@ describe("future", () => {
       .and(future.upgrade(() => future.of<number>(() => {
         throw new Error("Error");
       })))
-      .value()
+      .link()
       .when(
         value => {
           expect.fail(`Unexpected value ${value}`);
