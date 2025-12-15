@@ -4,6 +4,6 @@ export * as text from "./src/text";
 export * as list from "./src/list";
 export * as future from "./src/future";
 export * as numeric from "./src/numeric";
-export * as logic from "./src/logic";
+export * as basic from "./src/basic";
 export * as pattern from "./src/pattern";
 export * as http from "./src/http";
