@@ -124,10 +124,31 @@ function of<Value>(value: Value): Chain<Value>
 ```typescript
 import { chain } from "@aminnairi/prelude";
 
+const result = chain.of(10).link();
+
+console.log(result);
+// => 10
+```
+
+#### and
+
+Applies a function to the value inside the `Chain` and returns a new `Chain` with the result. If the function returns a `Chain`, it is automatically unwrapped.
+
+##### Signature
+
+```typescript
+and: <NewValue>(update: (value: Value) => NewValue | Chain<NewValue>) => Chain<NewValue>
+```
+
+##### Example
+
+```typescript
+import { chain } from "@aminnairi/prelude";
+
 const result = chain.of(10)
   .and(value => value * 2)
   .and(value => value + 5)
-  .value();
+  .link();
 
 console.log(result);
 // => 25
@@ -141,10 +162,33 @@ import { chain } from "@aminnairi/prelude";
 const result = chain.of(10)
   .and(value => chain.of(value + 1)) // An intermediate function returning a Chain
   .and(value => value * 2)
-  .value();
+  .link();
 
 console.log(result);
 // => 22 ( (10 + 1) * 2 )
+```
+
+#### link
+
+Extracts the value from the `Chain`.
+
+##### Signature
+
+```typescript
+link: () => Value
+```
+
+##### Example
+
+```typescript
+import { chain } from "@aminnairi/prelude";
+
+const result = chain.of(10)
+  .and(value => value * 2)
+  .link();
+
+console.log(result);
+// => 20
 ```
 
 ### text
