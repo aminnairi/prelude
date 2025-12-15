@@ -1,4 +1,4 @@
-import { list, chain, text, maybe, numeric, pattern, logic, future, http } from "@aminnairi/prelude";
+import { list, chain, text, maybe, numeric, pattern, basic, future, http, boolean } from "@aminnairi/prelude";
 import { z } from "zod";
 
 const fileContent = `
@@ -9,21 +9,21 @@ const fileContent = `
 
 const sumCSVFileContent = chain
   .of(text.lines())
-  .and(logic.pipe(list.update(text.split(";"))))
-  .and(logic.pipe(list.update(list.update(text.toInteger()))))
-  .and(logic.pipe(list.update(list.update(maybe.or(0)))))
-  .and(logic.pipe(list.update(list.upgrade(0, numeric.add()))))
-  .and(logic.pipe(list.upgrade(0, numeric.add())))
-  .value();
+  .and(basic.pipe(list.update(text.split(";"))))
+  .and(basic.pipe(list.update(list.update(text.toInteger()))))
+  .and(basic.pipe(list.update(list.update(maybe.or(0)))))
+  .and(basic.pipe(list.update(list.upgrade(0, numeric.add()))))
+  .and(basic.pipe(list.upgrade(0, numeric.add())))
+  .link();
 
 console.assert(sumCSVFileContent(fileContent) === 120, "CSV file sum should give 120");
 
 const isValidPassword = chain
   .of(pattern.test(/[a-z]/))
-  .and(logic.and(pattern.test(/[A-Z]/)))
-  .and(logic.and(pattern.test(/\d/)))
-  .and(logic.and(pattern.test(/[^a-zA-Z0-9]/)))
-  .value();
+  .and(boolean.and(pattern.test(/[A-Z]/)))
+  .and(boolean.and(pattern.test(/\d/)))
+  .and(boolean.and(pattern.test(/[^a-zA-Z0-9]/)))
+  .link();
 
 console.assert(isValidPassword("Password123!@#") === true, "Password123!@# should be valid");
 console.assert(isValidPassword("password") === false, "password should be invalid");
@@ -44,16 +44,16 @@ const userIdSchema = (input: JSON) => {
 
 const getUserPosts = chain
   .of(text.from)
-  .and(logic.pipe(text.prefix("https://jsonplaceholder.typicode.com/users/")))
-  .and(logic.pipe(http.get))
-  .and(logic.pipe(future.upgrade(http.json)))
-  .and(logic.pipe(future.update(userIdSchema)))
-  .and(logic.pipe(future.update(text.from)))
-  .and(logic.pipe(future.update(text.prefix("https://jsonplaceholder.typicode.com/users/"))))
-  .and(logic.pipe(future.update(text.suffix("/posts"))))
-  .and(logic.pipe(future.upgrade(http.get)))
-  .and(logic.pipe(future.upgrade(http.json)))
-  .value();
+  .and(basic.pipe(text.prefix("https://jsonplaceholder.typicode.com/users/")))
+  .and(basic.pipe(http.get))
+  .and(basic.pipe(future.upgrade(http.json)))
+  .and(basic.pipe(future.update(userIdSchema)))
+  .and(basic.pipe(future.update(text.from)))
+  .and(basic.pipe(future.update(text.prefix("https://jsonplaceholder.typicode.com/users/"))))
+  .and(basic.pipe(future.update(text.suffix("/posts"))))
+  .and(basic.pipe(future.upgrade(http.get)))
+  .and(basic.pipe(future.upgrade(http.json)))
+  .link();
 
 getUserPosts(1).when(console.log, console.error);
 // [{userId: 1, id: 7, title: "magnam facilitis autem", body: "..."}, ...]
