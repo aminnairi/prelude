@@ -46,7 +46,7 @@ import { chain, maybe } from "@aminnairi/prelude";
 
 const result = chain.of(maybe.some(10))
   .and(maybeItem => maybeItem.and(value => value * 2))
-  .value();
+  .link();
 
 console.log(result.or(0));
 // => 20
@@ -69,7 +69,7 @@ import { chain, maybe } from "@aminnairi/prelude";
 
 const result = chain.of(maybe.none<number>())
   .and(maybeItem => maybeItem.and(value => value * 2))
-  .value();
+  .link();
 
 console.log(result.or(0));
 // => 0
@@ -92,14 +92,14 @@ import { chain, maybe } from "@aminnairi/prelude";
 
 const valueWithSome = chain.of(maybe.some(10))
   .and(maybe.or(5))
-  .value();
+  .link();
 
 console.log(valueWithSome);
 // => 10
 
 const valueWithNone = chain.of(maybe.none<number>())
   .and(maybe.or(5))
-  .value();
+  .link();
 
 console.log(valueWithNone);
 // => 5
@@ -212,14 +212,14 @@ import { chain, text } from "@aminnairi/prelude";
 
 const numToString = chain.of(123)
   .and(text.from)
-  .value();
+  .link();
 
 console.log(numToString);
 // => "123"
 
 const boolToString = chain.of(true)
   .and(text.from)
-  .value();
+  .link();
 
 console.log(boolToString);
 // => "true"
@@ -242,7 +242,7 @@ import { chain, text } from "@aminnairi/prelude";
 
 const textLength = chain.of("Hello World")
   .and(text.count())
-  .value();
+  .link();
 
 console.log(textLength);
 // => 11
@@ -265,7 +265,7 @@ import { chain, text } from "@aminnairi/prelude";
 
 const greeting = chain.of("Hello")
   .and(text.concatenate(" World"))
-  .value();
+  .link();
 
 console.log(greeting);
 // => "Hello World"
@@ -288,7 +288,7 @@ import { chain, text } from "@aminnairi/prelude";
 
 const capitalized = chain.of("hello")
   .and(text.updateAll(char => char.toUpperCase()))
-  .value();
+  .link();
 
 console.log(capitalized);
 // => "HELLO"
@@ -311,7 +311,7 @@ import { chain, text } from "@aminnairi/prelude";
 
 const modifiedText = chain.of("Hello")
   .and(text.updateAt(0, char => char.toLowerCase()))
-  .value();
+  .link();
 
 console.log(modifiedText);
 // => "hello"
@@ -335,7 +335,7 @@ import { chain, text } from "@aminnairi/prelude";
 const multilineText = "Line 1\\nLine 2\\nLine 3";
 const textLines = chain.of(multilineText)
   .and(text.lines())
-  .value();
+  .link();
 
 console.log(textLines);
 // => ["Line 1", "Line 2", "Line 3"]
@@ -359,7 +359,7 @@ import { chain, text } from "@aminnairi/prelude";
 const commaSeparated = "apple,banana,orange";
 const fruits = chain.of(commaSeparated)
   .and(text.split(","))
-  .value();
+  .link();
 
 console.log(fruits);
 // => ["apple", "banana", "orange"]
@@ -384,7 +384,7 @@ const intString = "123";
 const parsedInt = chain.of(intString)
   .and(text.toInteger())
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(parsedInt);
 // => 123
@@ -393,7 +393,7 @@ const nonIntString = "abc";
 const notParsedInt = chain.of(nonIntString)
   .and(text.toInteger())
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(notParsedInt);
 // => 0
@@ -416,7 +416,7 @@ import { chain, text } from "@aminnairi/prelude";
 
 const prefixedText = chain.of("world")
   .and(text.prefix("Hello, "))
-  .value();
+  .link();
 
 console.log(prefixedText);
 // => "Hello, world"
@@ -439,7 +439,7 @@ import { chain, text } from "@aminnairi/prelude";
 
 const suffixedText = chain.of("Hello")
   .and(text.suffix(" World!"))
-  .value();
+  .link();
 
 console.log(suffixedText);
 // => "Hello World!"
@@ -466,7 +466,7 @@ import { chain, list } from "@aminnairi/prelude";
 
 const newlist = chain.of(1)
   .and(list.of(2, 3, 4))
-  .value();
+  .link();
 
 console.log(newlist);
 // => [2, 3, 4]
@@ -490,7 +490,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const evenNumbers = chain.of(numbers)
   .and(list.keep(n => n % 2 === 0))
-  .value();
+  .link();
 
 console.log(evenNumbers);
 // => [2, 4]
@@ -514,7 +514,7 @@ import { chain, list } from "@aminnairi/prelude";
 const words = ["hello", "world"];
 const sentence = chain.of(words)
   .and(list.join(" "))
-  .value();
+  .link();
 
 console.log(sentence);
 // => "hello world"
@@ -538,7 +538,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const oddNumbers = chain.of(numbers)
   .and(list.remove(n => n % 2 === 0))
-  .value();
+  .link();
 
 console.log(oddNumbers);
 // => [1, 3, 5]
@@ -562,7 +562,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [10, 20, 30];
 const withoutMiddle = chain.of(numbers)
   .and(list.removeAt(1))
-  .value();
+  .link();
 
 console.log(withoutMiddle);
 // => [10, 30]
@@ -586,7 +586,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3];
 const doubledNumbers = chain.of(numbers)
   .and(list.update(n => n * 2))
-  .value();
+  .link();
 
 console.log(doubledNumbers);
 // => [2, 4, 6]
@@ -610,7 +610,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3];
 const updatedList = chain.of(numbers)
   .and(list.updateAt(1, n => n * 10))
-  .value();
+  .link();
 
 console.log(updatedList);
 // => [1, 20, 3]
@@ -635,7 +635,7 @@ const numbers = [10, 20, 30];
 const firstNumber = chain.of(numbers)
   .and(list.first())
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(firstNumber);
 // => 10
@@ -644,7 +644,7 @@ const emptyList = [];
 const noNumber = chain.of(emptyList)
   .and(list.first())
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(noNumber);
 // => 0
@@ -669,7 +669,7 @@ const numbers = [10, 20, 30];
 const lastNumber = chain.of(numbers)
   .and(list.last())
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(lastNumber);
 // => 30
@@ -678,7 +678,7 @@ const emptyList = [];
 const noNumber = chain.of(emptyList)
   .and(list.last())
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(noNumber);
 // => 0
@@ -703,7 +703,7 @@ const numbers = [10, 20, 30];
 const numberAtOne = chain.of(numbers)
   .and(list.at(1))
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(numberAtOne);
 // => 20
@@ -711,7 +711,7 @@ console.log(numberAtOne);
 const numberAtFive = chain.of(numbers)
   .and(list.at(5))
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(numberAtFive);
 // => 0
@@ -735,7 +735,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const listCount = chain.of(numbers)
   .and(list.count())
-  .value();
+  .link();
 
 console.log(listCount);
 // => 5
@@ -759,7 +759,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const hasEven = chain.of(numbers)
   .and(list.any(n => n % 2 === 0))
-  .value();
+  .link();
 
 console.log(hasEven);
 // => true
@@ -783,7 +783,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [2, 4, 6];
 const allEven = chain.of(numbers)
   .and(list.all(n => n % 2 === 0))
-  .value();
+  .link();
 
 console.log(allEven);
 // => true
@@ -791,7 +791,7 @@ console.log(allEven);
 const mixedNumbers = [1, 2, 3];
 const allEvenMixed = chain.of(mixedNumbers)
   .and(list.all(n => n % 2 === 0))
-  .value();
+  .link();
 
 console.log(allEvenMixed);
 // => false
@@ -816,7 +816,7 @@ const numbers = [1, 2, 3, 4, 5];
 const firstEven = chain.of(numbers)
   .and(list.find(n => n % 2 === 0))
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(firstEven);
 // => 2
@@ -824,7 +824,7 @@ console.log(firstEven);
 const notFound = chain.of(numbers)
   .and(list.find(n => n > 10))
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(notFound);
 // => 0
@@ -849,7 +849,7 @@ const numbers = [10, 20, 30, 20];
 const indexOf20 = chain.of(numbers)
   .and(list.position(n => n === 20))
   .and(maybe.or(-1))
-  .value();
+  .link();
 
 console.log(indexOf20);
 // => 1
@@ -857,7 +857,7 @@ console.log(indexOf20);
 const indexOf40 = chain.of(numbers)
   .and(list.position(n => n === 40))
   .and(maybe.or(-1))
-  .value();
+  .link();
 
 console.log(indexOf40);
 // => -1
@@ -881,7 +881,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2];
 const appendedList = chain.of(numbers)
   .and(list.append(3, 4))
-  .value();
+  .link();
 
 console.log(appendedList);
 // => [1, 2, 3, 4]
@@ -905,7 +905,7 @@ import { chain, list } from "@aminnairi/prelude";
 const letters = ["a", "b", "c"];
 const enumerated = chain.of(letters)
   .and(list.enumerate())
-  .value();
+  .link();
 
 console.log(enumerated);
 // => [[0, "a"], [1, "b"], [2, "c"]]
@@ -952,7 +952,7 @@ import { chain, list } from "@aminnairi/prelude";
 const unsorted = [3, 1, 2];
 const sorted = chain.of(unsorted)
   .and(list.sort())
-  .value();
+  .link();
 
 console.log(sorted);
 // => [1, 2, 3]
@@ -976,7 +976,7 @@ import { chain, list } from "@aminnairi/prelude";
 const letters = ["a", "b", "c"];
 const listIndices = chain.of(letters)
   .and(list.indices())
-  .value();
+  .link();
 
 console.log(listIndices);
 // => [0, 1, 2]
@@ -1000,14 +1000,14 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [10, 20, 30];
 const hasTwenty = chain.of(numbers)
   .and(list.has(n => n === 20))
-  .value();
+  .link();
 
 console.log(hasTwenty);
 // => true
 
 const hasForty = chain.of(numbers)
   .and(list.has(n => n === 40))
-  .value();
+  .link();
 
 console.log(hasForty);
 // => false
@@ -1031,7 +1031,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const droppedList = chain.of(numbers)
   .and(list.drop(2))
-  .value();
+  .link();
 
 console.log(droppedList);
 // => [3, 4, 5]
@@ -1055,7 +1055,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const droppedLastList = chain.of(numbers)
   .and(list.dropLast(2))
-  .value();
+  .link();
 
 console.log(droppedLastList);
 // => [1, 2, 3]
@@ -1079,7 +1079,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const droppedUntilList = chain.of(numbers)
   .and(list.dropUntil(n => n >= 3))
-  .value();
+  .link();
 
 console.log(droppedUntilList);
 // => [3, 4, 5]
@@ -1103,7 +1103,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const takenList = chain.of(numbers)
   .and(list.take(3))
-  .value();
+  .link();
 
 console.log(takenList);
 // => [1, 2, 3]
@@ -1127,7 +1127,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const takenLastList = chain.of(numbers)
   .and(list.takeLast(3))
-  .value();
+  .link();
 
 console.log(takenLastList);
 // => [3, 4, 5]
@@ -1151,7 +1151,7 @@ import { chain, list } from "@aminnairi/prelude";
 const numbers = [1, 2, 3, 4, 5];
 const takenUntilList = chain.of(numbers)
   .and(list.takeUntil(n => n >= 3))
-  .value();
+  .link();
 
 console.log(takenUntilList);
 // => [1, 2]
@@ -1176,7 +1176,7 @@ const list1 = [1, 2, 3];
 const list2 = ["a", "b", "c", "d"];
 const zippedList = chain.of(list1)
   .and(list.zip(list2))
-  .value();
+  .link();
 
 console.log(zippedList);
 // => [[1, "a"], [2, "b"], [3, "c"]]
@@ -1199,7 +1199,7 @@ import { chain, list } from "@aminnairi/prelude";
 
 const sum = chain.of([1, 2, 3, 4, 5])
   .and(list.upgrade(0, (total, num) => total + num))
-  .value();
+  .link();
 
 console.log(sum);
 // => 15
@@ -1285,7 +1285,7 @@ import { chain, future } from "@aminnairi/prelude";
 
 const success = chain.of("Data Loaded")
   .and(future.succeed)
-  .value();
+  .link();
 
 success.when(
   value => console.log(value),
@@ -1311,7 +1311,7 @@ import { chain, future } from "@aminnairi/prelude";
 
 const failure = chain.of("Network Error")
   .and(future.fail)
-  .value();
+  .link();
 
 failure.when(
   value => console.log(value),
@@ -1338,7 +1338,7 @@ import { chain, future } from "@aminnairi/prelude";
 const doubled = chain.of(10)
   .and(future.succeed)
   .and(future.update(value => value * 2))
-  .value();
+  .link();
 
 doubled.when(
   value => console.log(value),
@@ -1369,7 +1369,7 @@ const fetchData = (id: number) => future.of<string>((succeed) => {
 const userProfile = chain.of(123)
   .and(future.succeed)
   .and(future.upgrade(fetchData))
-  .value();
+  .link();
 
 userProfile.when(
   value => console.log(value),
@@ -1424,14 +1424,14 @@ import { chain, pattern } from "@aminnairi/prelude";
 
 const hasNumber = chain.of("hello123world")
   .and(pattern.test(/\d+/))
-  .value();
+  .link();
 
 console.log(hasNumber);
 // => true
 
 const hasNoNumber = chain.of("helloworld")
   .and(pattern.test(/\d+/))
-  .value();
+  .link();
 
 console.log(hasNoNumber);
 // => false
@@ -1461,7 +1461,7 @@ import { chain, future, http } from "@aminnairi/prelude";
 
 chain.of("https://invalid.url")
   .and(http.get)
-  .value()
+  .link()
   .when(
     value => console.log("Success:", value),
     issue => {
@@ -1498,7 +1498,7 @@ const invalidJsonResponse = new Response("not json", { status: 200 });
 
 chain.of(invalidJsonResponse)
   .and(http.json)
-  .value()
+  .link()
   .when(
     value => console.log("Success:", value),
     issue => {
@@ -1529,7 +1529,7 @@ import { chain, future, http } from "@aminnairi/prelude";
 
 chain.of("https://jsonplaceholder.typicode.com/todos/1")
   .and(http.get)
-  .value()
+  .link()
   .when(
     response => console.log("Status:", response.status),
     issue => console.error("Error:", issue)
@@ -1555,7 +1555,7 @@ import { chain, future, http } from "@aminnairi/prelude";
 chain.of("https://jsonplaceholder.typicode.com/todos/1")
   .and(http.get)
   .and(future.upgrade(http.json))
-  .value()
+  .link()
   .when(
     data => console.log("Data:", data),
     issue => console.error("Error:", issue)
@@ -1580,14 +1580,14 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isBetween = chain.of(5)
   .and(numeric.between(1, 10))
-  .value();
+  .link();
 
 console.log(isBetween);
 // => true
 
 const isNotBetween = chain.of(15)
   .and(numeric.between(1, 10))
-  .value();
+  .link();
 
 console.log(isNotBetween);
 // => false
@@ -1610,7 +1610,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isEqual = chain.of(5)
   .and(numeric.equalTo(5))
-  .value();
+  .link();
 
 console.log(isEqual);
 // => true
@@ -1633,7 +1633,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isDifferent = chain.of(5)
   .and(numeric.differentThan(10))
-  .value();
+  .link();
 
 console.log(isDifferent);
 // => true
@@ -1656,7 +1656,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isGreater = chain.of(10)
   .and(numeric.greaterThan(5))
-  .value();
+  .link();
 
 console.log(isGreater);
 // => true
@@ -1679,7 +1679,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isLower = chain.of(5)
   .and(numeric.lowerThan(10))
-  .value();
+  .link();
 
 console.log(isLower);
 // => true
@@ -1702,7 +1702,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isGreaterOrEqual = chain.of(10)
   .and(numeric.greaterOrEqualTo(10))
-  .value();
+  .link();
 
 console.log(isGreaterOrEqual);
 // => true
@@ -1725,7 +1725,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isLowerOrEqual = chain.of(5)
   .and(numeric.lowerOrEqualTo(5))
-  .value();
+  .link();
 
 console.log(isLowerOrEqual);
 // => true
@@ -1748,7 +1748,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isDivisible = chain.of(10)
   .and(numeric.divisibleBy(2))
-  .value();
+  .link();
 
 console.log(isDivisible);
 // => true
@@ -1771,7 +1771,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const sum = chain.of(5)
   .and(numeric.add(3))
-  .value();
+  .link();
 
 console.log(sum);
 // => 8
@@ -1784,7 +1784,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const total = chain.of(10)
   .and(numeric.add(1, 2, 3)) // Adds 1, 2, and 3 to 10
-  .value();
+  .link();
 
 console.log(total);
 // => 16
@@ -1807,7 +1807,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const difference = chain.of(10)
   .and(numeric.subtract(4))
-  .value();
+  .link();
 
 console.log(difference);
 // => 6
@@ -1830,7 +1830,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const product = chain.of(6)
   .and(numeric.multiply(7))
-  .value();
+  .link();
 
 console.log(product);
 // => 42
@@ -1853,14 +1853,14 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const quotient = chain.of(10)
   .and(numeric.divide(2))
-  .value();
+  .link();
 
 console.log(quotient.or(0));
 // => 5
 
 const divisionByZero = chain.of(10)
   .and(numeric.divide(0))
-  .value();
+  .link();
 
 console.log(divisionByZero.or(0));
 // => 0
@@ -1883,7 +1883,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const result = chain.of(2)
   .and(numeric.toPower(3))
-  .value();
+  .link();
 
 console.log(result);
 // => 8
@@ -1906,7 +1906,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const maxNumber = chain.of(5)
   .and(numeric.maximum(10, 2))
-  .value();
+  .link();
 
 console.log(maxNumber);
 // => 10
@@ -1929,7 +1929,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const minNumber = chain.of(5)
   .and(numeric.minimum(10, 2))
-  .value();
+  .link();
 
 console.log(minNumber);
 // => 2
@@ -1952,7 +1952,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const comparisonResult = chain.of(10)
   .and(numeric.compare(5))
-  .value();
+  .link();
 
 console.log(comparisonResult === numeric.Comparison.Greater);
 // => true
@@ -1993,14 +1993,14 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isBetween = chain.of(5)
   .and(numeric.between(1, 10))
-  .value();
+  .link();
 
 console.log(isBetween);
 // => true
 
 const isNotBetween = chain.of(15)
   .and(numeric.between(1, 10))
-  .value();
+  .link();
 
 console.log(isNotBetween);
 // => false
@@ -2023,7 +2023,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isEqual = chain.of(5)
   .and(numeric.equalTo(5))
-  .value();
+  .link();
 
 console.log(isEqual);
 // => true
@@ -2046,7 +2046,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isDifferent = chain.of(5)
   .and(numeric.differentThan(10))
-  .value();
+  .link();
 
 console.log(isDifferent);
 // => true
@@ -2069,7 +2069,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isGreater = chain.of(10)
   .and(numeric.greaterThan(5))
-  .value();
+  .link();
 
 console.log(isGreater);
 // => true
@@ -2092,7 +2092,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isLower = chain.of(5)
   .and(numeric.lowerThan(10))
-  .value();
+  .link();
 
 console.log(isLower);
 // => true
@@ -2115,7 +2115,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isGreaterOrEqual = chain.of(10)
   .and(numeric.greaterOrEqualTo(10))
-  .value();
+  .link();
 
 console.log(isGreaterOrEqual);
 // => true
@@ -2138,7 +2138,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isLowerOrEqual = chain.of(5)
   .and(numeric.lowerOrEqualTo(5))
-  .value();
+  .link();
 
 console.log(isLowerOrEqual);
 // => true
@@ -2161,7 +2161,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const isDivisible = chain.of(10)
   .and(numeric.divisibleBy(2))
-  .value();
+  .link();
 
 console.log(isDivisible);
 // => true
@@ -2184,7 +2184,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const sum = chain.of(5)
   .and(numeric.add(3))
-  .value();
+  .link();
 
 console.log(sum);
 // => 8
@@ -2197,7 +2197,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const total = chain.of(10)
   .and(numeric.add(1, 2, 3)) // Adds 1, 2, and 3 to 10
-  .value();
+  .link();
 
 console.log(total);
 // => 16
@@ -2220,7 +2220,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const difference = chain.of(10)
   .and(numeric.subtract(4))
-  .value();
+  .link();
 
 console.log(difference);
 // => 6
@@ -2243,7 +2243,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const product = chain.of(6)
   .and(numeric.multiply(7))
-  .value();
+  .link();
 
 console.log(product);
 // => 42
@@ -2267,7 +2267,7 @@ import { chain, numeric, maybe } from "@aminnairi/prelude";
 const quotient = chain.of(10)
   .and(numeric.divide(2))
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(quotient);
 // => 5
@@ -2275,7 +2275,7 @@ console.log(quotient);
 const divisionByZero = chain.of(10)
   .and(numeric.divide(0))
   .and(maybe.or(0))
-  .value();
+  .link();
 
 console.log(divisionByZero);
 // => 0
@@ -2298,7 +2298,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const result = chain.of(2)
   .and(numeric.toPower(3))
-  .value();
+  .link();
 
 console.log(result);
 // => 8
@@ -2321,7 +2321,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const maxNumber = chain.of(5)
   .and(numeric.maximum(10, 2))
-  .value();
+  .link();
 
 console.log(maxNumber);
 // => 10
@@ -2344,7 +2344,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const minNumber = chain.of(5)
   .and(numeric.minimum(10, 2))
-  .value();
+  .link();
 
 console.log(minNumber);
 // => 2
@@ -2367,7 +2367,7 @@ import { chain, numeric } from "@aminnairi/prelude";
 
 const comparisonResult = chain.of(10)
   .and(numeric.compare(5))
-  .value();
+  .link();
 
 console.log(comparisonResult === numeric.Comparison.Greater);
 // => true
@@ -2417,7 +2417,7 @@ const isPositive = (num: number) => num > 0;
 
 const isEvenAndPositive = chain.of(isEven)
   .and(logic.and(isPositive))
-  .value();
+  .link();
 
 console.log(isEvenAndPositive(4));
 // => true
@@ -2445,7 +2445,7 @@ const isNegative = (num: number) => num < 0;
 
 const isEvenOrNegative = chain.of(isEven)
   .and(logic.or(isNegative))
-  .value();
+  .link();
 
 console.log(isEvenOrNegative(3));
 // => false
@@ -2475,7 +2475,7 @@ const multiplyByTwo = (num: number) => num * 2;
 
 const addOneThenMultiplyByTwo = chain.of(addOne)
   .and(logic.pipe(multiplyByTwo))
-  .value();
+  .link();
 
 console.log(addOneThenMultiplyByTwo(5));
 // => 12 ((5 + 1) * 2)
