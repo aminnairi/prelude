@@ -24,3 +24,9 @@ export const or = <Value>(value: Value) => {
     return maybe.or(value);
   };
 };
+
+export const and = <Value, NewValue>(update: (value: Value) => NewValue) => {
+  return (maybe: Maybe<Value>) => {
+    return maybe.and(update);
+  };
+};
