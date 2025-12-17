@@ -35,7 +35,7 @@ Description of the function
 
 ##### Signature
 
-Function signature in here inside of a code block.
+Function signature in here inside of a code block. Be sure to include all overloaded variants.
 
 ##### Example
 
