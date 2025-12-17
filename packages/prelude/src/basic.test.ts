@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import * as basic from "./basic";
 import * as chain from "./chain";
 
@@ -15,5 +15,23 @@ describe("basics", () => {
       .link();
 
     expect(charactersToNumbers("12345")).toBe(15);
+  });
+
+  describe("peek", () => {
+    test("not curried", () => {
+      const callback = vi.fn();
+
+      basic.peek(callback, 123);
+
+      expect(callback).toHaveBeenCalledOnce();
+    });
+
+    test("curried", () => {
+      const callback = vi.fn();
+
+      chain.of(123).and(basic.peek(callback));
+
+      expect(callback).toHaveBeenCalledOnce();
+    });
   });
 });
