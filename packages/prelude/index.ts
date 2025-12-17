@@ -9,3 +9,4 @@ export * as pattern from "./src/pattern";
 export * as http from "./src/http";
 export * as boolean from "./src/boolean";
 export * as web from "./src/web";
+export * as result from "./src/result";
