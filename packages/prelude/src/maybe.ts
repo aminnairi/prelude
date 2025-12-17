@@ -1,6 +1,6 @@
 export interface Maybe<Value> {
   and: <NewValue>(update: (value: Value) => NewValue) => Maybe<NewValue>;
-  or: (fallback: Value) => Value;
+  or: <NewValue>(fallback: NewValue) => Value | NewValue;
 }
 
 export function some<Value>(value: Value): Maybe<Value> {
