@@ -42,12 +42,9 @@ function some<Value>(value: Value): Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, maybe } from "@aminnairi/prelude";
+import { maybe } from "@aminnairi/prelude";
 
-const result = chain.of(maybe.some(10))
-  .and(maybeItem => maybeItem.and(value => value * 2))
-  .link();
-
+const result = maybe.some(10).and(value => value * 2);
 console.log(result.or(0));
 // => 20
 ```
@@ -65,12 +62,9 @@ function none<Value>(): Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, maybe } from "@aminnairi/prelude";
+import { maybe } from "@aminnairi/prelude";
 
-const result = chain.of(maybe.none<number>())
-  .and(maybeItem => maybeItem.and(value => value * 2))
-  .link();
-
+const result = maybe.none<number>().and(value => value * 2);
 console.log(result.or(0));
 // => 0
 ```
@@ -103,6 +97,29 @@ const valueWithNone = chain.of(maybe.none<number>())
 
 console.log(valueWithNone);
 // => 5
+```
+
+#### and
+
+A curried function that applies a function to the value inside a `Maybe`.
+
+##### Signature
+
+```typescript
+export const and: <Value, NewValue>(update: (value: Value) => NewValue) => (maybe: Maybe<Value>) => Maybe<NewValue>;
+```
+
+##### Example
+
+```typescript
+import { chain, maybe } from "@aminnairi/prelude";
+
+const result = chain.of(maybe.some(10))
+  .and(maybe.and(value => value * 2))
+  .link();
+
+console.log(result.or(0));
+// => 20
 ```
 
 ### chain
@@ -191,258 +208,426 @@ console.log(result);
 // => 20
 ```
 
-### text
+### basic
 
-The `text` module provides functions for immutable string manipulation using a functional approach.
+The `basic` module provides fundamental utilities for function composition.
 
-#### from
+#### pipe
 
-Converts an unknown input to its string representation.
+Returns a new function that composes two functions, where the output of the first function becomes the input of the second function.
 
 ##### Signature
 
 ```typescript
-function from(input: unknown): string
+function pipe<Input, Output, Value>(second: (input: Output) => Value): (first: (input: Input) => Output) => (input: Input) => Value
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { basic, chain } from "@aminnairi/prelude";
 
-const numToString = chain.of(123)
-  .and(text.from)
+const addOne = (num: number) => num + 1;
+const multiplyByTwo = (num: number) => num * 2;
+
+const addOneThenMultiplyByTwo = chain.of(addOne)
+  .and(basic.pipe(multiplyByTwo))
   .link();
 
-console.log(numToString);
-// => "123"
-
-const boolToString = chain.of(true)
-  .and(text.from)
-  .link();
-
-console.log(boolToString);
-// => "true"
+console.log(addOneThenMultiplyByTwo(5));
+// => 12 ((5 + 1) * 2)
 ```
 
-#### count
+#### peek
 
-Returns the number of characters in a string.
+Allows "peeking" at a value in a chain for debugging or side-effects without altering the value. It can be used in a curried manner within a chain or directly with a value.
 
 ##### Signature
 
 ```typescript
-function count(): (text: string) => number
+function peek<Value>(callback: (value: Value) => void): (value: Value) => void;
+function peek<Value>(callback: (value: Value) => void, value: Value): void;
+```
+
+##### Example (curried)
+
+```typescript
+import { basic, chain } from "@aminnairi/prelude";
+
+chain.of(123)
+  .and(basic.peek(console.log)) // logs 123
+  .and(value => value * 2)
+  .and(basic.peek(console.log)); // logs 246
+```
+
+##### Example (direct)
+
+```typescript
+import { basic } from "@aminnairi/prelude";
+
+basic.peek(console.log, "hello"); // logs "hello"
+```
+
+### boolean
+
+The `boolean` module provides functions for logical operations.
+
+#### not
+
+Returns a new function that negates the boolean result of the input `callback` function.
+
+##### Signature
+
+```typescript
+function not<Parameters extends Array<unknown>>(callback: (...parameters: Parameters) => boolean): (...args: Parameters) => boolean
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { boolean } from "@aminnairi/prelude";
 
-const textLength = chain.of("Hello World")
-  .and(text.count())
-  .link();
+const isEven = (num: number) => num % 2 === 0;
+const isOdd = boolean.not(isEven);
 
-console.log(textLength);
-// => 11
+console.log(isOdd(5));
+// => true
+console.log(isOdd(4));
+// => false
 ```
 
-#### concatenate
+#### and
 
-Concatenates a `suffix` string to the current string.
+Returns a new function that performs a logical AND operation on the results of two input boolean-returning functions.
 
 ##### Signature
 
 ```typescript
-function concatenate(suffix: string): (text: string) => string
+function and<Parameters extends Array<unknown>>(secondCallback: (...parameters: Parameters) => boolean): (firstCallback: (...parameters: Parameters) => boolean) => (...parameters: Parameters) => boolean
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { chain, boolean } from "@aminnairi/prelude";
 
-const greeting = chain.of("Hello")
-  .and(text.concatenate(" World"))
+const isEven = (num: number) => num % 2 === 0;
+const isPositive = (num: number) => num > 0;
+
+const isEvenAndPositive = chain.of(isEven)
+  .and(boolean.and(isPositive))
   .link();
 
-console.log(greeting);
-// => "Hello World"
+console.log(isEvenAndPositive(4));
+// => true
+console.log(isEvenAndPositive(-2));
+// => false
 ```
 
-#### updateAll
+#### or
 
-Applies an `update` function to each character of a string.
+Returns a new function that performs a logical OR operation on the results of two input boolean-returning functions.
 
 ##### Signature
 
 ```typescript
-function updateAll(update: (character: string) => string): (text: string) => string
+function or<Parameters extends Array<unknown>>(secondCallback: (...parameters: Parameters) => boolean): (firstCallback: (...parameters: Parameters) => boolean) => (...parameters: Parameters) => boolean
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { chain, boolean } from "@aminnairi/prelude";
 
-const capitalized = chain.of("hello")
-  .and(text.updateAll(char => char.toUpperCase()))
+const isEven = (num: number) => num % 2 === 0;
+const isNegative = (num: number) => num < 0;
+
+const isEvenOrNegative = chain.of(isEven)
+  .and(boolean.or(isNegative))
   .link();
 
-console.log(capitalized);
-// => "HELLO"
+console.log(isEvenOrNegative(3));
+// => false
+console.log(isEvenOrNegative(-5));
+// => true
+console.log(isEvenOrNegative(4));
+// => true
 ```
 
-#### updateAt
+### future
 
-Applies an `update` function to the character at a specific `index` of a string.
+The `future` module provides a way to represent asynchronous operations that may succeed with a value or fail with an issue, similar to Promises but with a functional approach.
+
+#### UnexpectedIssue
+
+Represents an unexpected error that occurred within a `Future` operation, typically from synchronous exceptions.
 
 ##### Signature
 
 ```typescript
-function updateAt(index: number, update: (character: string) => string): (text: string) => string
+class UnexpectedIssue extends Error {
+  readonly name: "UnexpectedIssue";
+  constructor(error: unknown);
+}
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { future } from "@aminnairi/prelude";
 
-const modifiedText = chain.of("Hello")
-  .and(text.updateAt(0, char => char.toLowerCase()))
-  .link();
+const throwingFuture = future.of(() => {
+  throw new Error("Something unexpected happened");
+});
 
-console.log(modifiedText);
-// => "hello"
+throwingFuture.when(
+  value => console.log(value),
+  issue => {
+    if (issue instanceof future.UnexpectedIssue) {
+      console.error("Unexpected Error Caught:", issue.error);
+    }
+  }
+);
+// => Unexpected Error Caught: Error: Something unexpected happened
 ```
 
-#### lines
+#### of
 
-Splits a string into an array of lines based on the newline character.
+Creates a `Future` instance by providing a function that takes `succeed` and `fail` callbacks.
 
 ##### Signature
 
 ```typescript
-function lines(): (text: string) => Array<string>
+function of<Value = never, Issue = UnexpectedIssue>(run: (succeed: (value: Value) => void, fail: (issue: Issue) => void) => void): Future<Value, Issue | UnexpectedIssue>
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { future } from "@aminnairi/prelude";
 
-const multilineText = "Line 1\\nLine 2\\nLine 3";
-const textLines = chain.of(multilineText)
-  .and(text.lines())
-  .link();
+const successfulFuture = future.of<string>((succeed) => {
+  setTimeout(() => succeed("Operation Successful"), 100);
+});
 
-console.log(textLines);
-// => ["Line 1", "Line 2", "Line 3"]
+successfulFuture.when(
+  value => console.log(value),
+  error => console.error(error)
+);
+// => Operation Successful
 ```
 
-#### split
+#### succeed
 
-Splits a string into an array of substrings using the specified `separator`.
+Creates a `Future` instance that immediately succeeds with the given `value`.
 
 ##### Signature
 
 ```typescript
-function split(separator: string): (text: string) => Array<string>
+function succeed<Value = never>(value: Value): Future<Value>
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { future } from "@aminnairi/prelude";
 
-const commaSeparated = "apple,banana,orange";
-const fruits = chain.of(commaSeparated)
-  .and(text.split(","))
-  .link();
+const success = future.succeed("Data Loaded");
 
-console.log(fruits);
-// => ["apple", "banana", "orange"]
+success.when(
+  value => console.log(value),
+  error => console.error(error)
+);
+// => Data Loaded
 ```
 
-#### toInteger
+#### fail
 
-Converts a string to an integer. Returns a `Maybe<number>` to handle invalid number strings.
+Creates a `Future` instance that immediately fails with the given `issue`.
 
 ##### Signature
 
 ```typescript
-function toInteger(): (text: string) => maybe.Maybe<number>
+function fail<Issue>(issue: Issue): Future<never, Issue | UnexpectedIssue>
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text, maybe } from "@aminnairi/prelude";
+import { future } from "@aminnairi/prelude";
 
-const intString = "123";
-const parsedInt = chain.of(intString)
-  .and(text.toInteger())
-  .and(maybe.or(0))
-  .link();
+const failure = future.fail("Network Error");
 
-console.log(parsedInt);
-// => 123
-
-const nonIntString = "abc";
-const notParsedInt = chain.of(nonIntString)
-  .and(text.toInteger())
-  .and(maybe.or(0))
-  .link();
-
-console.log(notParsedInt);
-// => 0
+failure.when(
+  value => console.log(value),
+  error => console.error(error)
+);
+// => Network Error
 ```
 
-#### prefix
+#### update
 
-Adds a `prefix` string to the beginning of the current string.
+Transforms the successful value of a `Future` using a `transform` function, returning a new `Future`. If the original `Future` fails, the new `Future` will also fail with the same issue.
 
 ##### Signature
 
 ```typescript
-function prefix(prefix: string): (text: string) => string
+function update<Value, Issue, NewValue>(transform: (value: Value) => NewValue): (future: Future<Value, Issue>) => Future<NewValue, Issue | UnexpectedIssue>
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { chain, future } from "@aminnairi/prelude";
 
-const prefixedText = chain.of("world")
-  .and(text.prefix("Hello, "))
+const aFuture = future.succeed(10);
+
+const doubled = chain.of(aFuture)
+  .and(future.update(value => value * 2))
   .link();
 
-console.log(prefixedText);
-// => "Hello, world"
+doubled.when(
+  value => console.log(value),
+  error => console.error(error)
+);
+// => 20
 ```
 
-#### suffix
+#### upgrade
 
-Adds a `suffix` string to the end of the current string.
+Transforms the successful value of a `Future` into another `Future` using an `update` function, effectively flattening nested futures. If either the original `Future` or the `update` function's `Future` fails, the resulting `Future` will fail.
 
 ##### Signature
 
 ```typescript
-function suffix(suffix: string): (text: string) => string
+function upgrade<Value, Issue, NewValue, NewIssue>(update: (value: Value) => Future<NewValue, NewIssue>): (future: Future<Value, Issue>) => Future<NewValue, Issue | NewIssue | UnexpectedIssue>
 ```
 
 ##### Example
 
 ```typescript
-import { chain, text } from "@aminnairi/prelude";
+import { chain, future } from "@aminnairi/prelude";
 
-const suffixedText = chain.of("Hello")
-  .and(text.suffix(" World!"))
+const fetchData = (id: number) => future.of<string>((succeed) => {
+  setTimeout(() => succeed(`Data for ${id}`), 50);
+});
+
+const userProfile = chain.of(future.succeed(123))
+  .and(future.upgrade(fetchData))
   .link();
 
-console.log(suffixedText);
-// => "Hello World!"
+userProfile.when(
+  value => console.log(value),
+  error => console.error(error)
+);
+// => Data for 123
+```
+
+#### when
+
+Executes `success` callback if the `Future` succeeds, or `failure` callback if it fails. Returns the original `Future` (for chaining).
+
+##### Signature
+
+```typescript
+function when<Value, Issue>(success: (value: Value) => void, failure: (issue: Issue | UnexpectedIssue) => void): (future: Future<Value, Issue>) => Future<Value, Issue>
+```
+
+##### Example
+
+```typescript
+import { chain, future } from "@aminnairi/prelude";
+
+const myFuture = future.succeed("Hello");
+
+chain.of(myFuture)
+  .and(future.when(
+    value => console.log("Success:", value),
+    error => console.error("Failure:", error)
+  ));
+// => Success: Hello
+```
+
+### http
+
+The `http` module provides functions for making HTTP requests and handling responses in a functional way, utilizing the `Future` and `Maybe` modules for asynchronous operations and optional values.
+
+#### HttpError
+
+Represents an error that occurred during an HTTP request.
+
+##### Signature
+
+```typescript
+class HttpError extends Error {
+  readonly name: "HttpError";
+  constructor(public readonly error: unknown);
+}
+```
+
+#### JsonError
+
+Represents an error that occurred during JSON parsing of an HTTP response.
+
+##### Signature
+
+```typescript
+class JsonError extends Error {
+  readonly name: "JsonError";
+  constructor(public readonly error: Error);
+}
+```
+
+#### getText
+
+Sends an HTTP GET request to the specified URL. It returns a `Future` which resolves with a `Response` object.
+
+##### Signature
+
+```typescript
+function getText(url: string, options?: RequestInit): future.Future<Response, HttpError | future.UnexpectedIssue>
+```
+
+##### Example
+
+```typescript
+import { http } from "@aminnairi/prelude";
+
+http.getText("https://jsonplaceholder.typicode.com/users")
+  .when(
+    response => {
+      console.log(response.status);
+    },
+    issue => {
+      console.error(issue);
+    }
+  );
+```
+
+#### getJson
+
+Sends an HTTP GET request and parses the response body as JSON. It returns a `Future` which resolves with the JSON data.
+
+##### Signature
+
+```typescript
+function getJson(url: string, options?: RequestInit): future.Future<JSON, JsonError | future.UnexpectedIssue>
+```
+
+##### Example
+
+```typescript
+import { http } from "@aminnairi/prelude";
+
+http.getJson("https://jsonplaceholder.typicode.com/users")
+  .when(
+    json => {
+      console.log(json);
+    },
+    issue => {
+      console.error(issue);
+    }
+  );
 ```
 
 ### list
@@ -462,14 +647,12 @@ function of<Value = never>(...values: Value[]): Array<Value>
 ##### Example
 
 ```typescript
-import { chain, list } from "@aminnairi/prelude";
+import { list } from "@aminnairi/prelude";
 
-const newlist = chain.of(1)
-  .and(list.of(2, 3, 4))
-  .link();
+const newList = list.of(1, 2, 3, 4);
 
-console.log(newlist);
-// => [2, 3, 4]
+console.log(newList);
+// => [1, 2, 3, 4]
 ```
 
 #### keep
@@ -629,22 +812,16 @@ function first<Value>(): (list: Array<Value>) => maybe.Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, list, maybe } from "@aminnairi/prelude";
+import { list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30];
-const firstNumber = chain.of(numbers)
-  .and(list.first())
-  .and(maybe.or(0))
-  .link();
+const firstNumber = list.first()(numbers).or(0);
 
 console.log(firstNumber);
 // => 10
 
-const emptyList = [];
-const noNumber = chain.of(emptyList)
-  .and(list.first())
-  .and(maybe.or(0))
-  .link();
+const emptyList: number[] = [];
+const noNumber = list.first()(emptyList).or(0);
 
 console.log(noNumber);
 // => 0
@@ -663,22 +840,16 @@ function last<Value>(): (list: Array<Value>) => maybe.Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, list, maybe } from "@aminnairi/prelude";
+import { list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30];
-const lastNumber = chain.of(numbers)
-  .and(list.last())
-  .and(maybe.or(0))
-  .link();
+const lastNumber = list.last()(numbers).or(0);
 
 console.log(lastNumber);
 // => 30
 
-const emptyList = [];
-const noNumber = chain.of(emptyList)
-  .and(list.last())
-  .and(maybe.or(0))
-  .link();
+const emptyList: number[] = [];
+const noNumber = list.last()(emptyList).or(0);
 
 console.log(noNumber);
 // => 0
@@ -697,21 +868,15 @@ function at<Value>(index: number): (list: Array<Value>) => maybe.Maybe<Value>
 ##### Example
 
 ```typescript
-import { chain, list, maybe } from "@aminnairi/prelude";
+import { list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30];
-const numberAtOne = chain.of(numbers)
-  .and(list.at(1))
-  .and(maybe.or(0))
-  .link();
+const numberAtOne = list.at(1)(numbers).or(0);
 
 console.log(numberAtOne);
 // => 20
 
-const numberAtFive = chain.of(numbers)
-  .and(list.at(5))
-  .and(maybe.or(0))
-  .link();
+const numberAtFive = list.at(5)(numbers).or(0);
 
 console.log(numberAtFive);
 // => 0
@@ -810,24 +975,13 @@ function find<Value>(accept: (value: Value) => boolean): (list: Array<Value>) =>
 ##### Example
 
 ```typescript
-import { chain, list, maybe } from "@aminnairi/prelude";
+import { list, maybe } from "@aminnairi/prelude";
 
 const numbers = [1, 2, 3, 4, 5];
-const firstEven = chain.of(numbers)
-  .and(list.find(n => n % 2 === 0))
-  .and(maybe.or(0))
-  .link();
+const firstEven = list.find((n: number) => n % 2 === 0)(numbers).or(0);
 
 console.log(firstEven);
 // => 2
-
-const notFound = chain.of(numbers)
-  .and(list.find(n => n > 10))
-  .and(maybe.or(0))
-  .link();
-
-console.log(notFound);
-// => 0
 ```
 
 #### position
@@ -843,24 +997,13 @@ function position<Value>(is: (value: Value) => boolean): (list: Array<Value>) =>
 ##### Example
 
 ```typescript
-import { chain, list, maybe } from "@aminnairi/prelude";
+import { list, maybe } from "@aminnairi/prelude";
 
 const numbers = [10, 20, 30, 20];
-const indexOf20 = chain.of(numbers)
-  .and(list.position(n => n === 20))
-  .and(maybe.or(-1))
-  .link();
+const indexOf20 = list.position((n: number) => n === 20)(numbers).or(-1);
 
 console.log(indexOf20);
 // => 1
-
-const indexOf40 = chain.of(numbers)
-  .and(list.position(n => n === 40))
-  .and(maybe.or(-1))
-  .link();
-
-console.log(indexOf40);
-// => -1
 ```
 
 #### append
@@ -1205,759 +1348,6 @@ console.log(sum);
 // => 15
 ```
 
-### future
-
-The `future` module provides a way to represent asynchronous operations that may succeed with a value or fail with an issue, similar to Promises but with a functional approach.
-
-#### UnexpectedIssue
-
-Represents an unexpected error that occurred within a `Future` operation, typically from synchronous exceptions.
-
-##### Signature
-
-```typescript
-class UnexpectedIssue extends Error {
-  readonly name: "UnexpectedIssue";
-  constructor(error: unknown);
-}
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const throwingFuture = future.of(() => {
-  throw new Error("Something unexpected happened");
-});
-
-throwingFuture.when(
-  value => console.log(value),
-  issue => {
-    if (issue instanceof future.UnexpectedIssue) {
-      console.error("Unexpected Error Caught:", issue.error);
-    }
-  }
-);
-// => Unexpected Error Caught: Error: Something unexpected happened
-```
-
-#### of
-
-Creates a `Future` instance by providing a function that takes `succeed` and `fail` callbacks.
-
-##### Signature
-
-```typescript
-function of<Value = never, Issue = UnexpectedIssue>(run: (succeed: (value: Value) => void, fail: (issue: Issue) => void) => void): Future<Value, Issue | UnexpectedIssue>
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const successfulFuture = future.of<string>((succeed) => {
-  setTimeout(() => succeed("Operation Successful"), 100);
-});
-
-successfulFuture.when(
-  value => console.log(value),
-  error => console.error(error)
-);
-// => Operation Successful
-```
-
-#### succeed
-
-Creates a `Future` instance that immediately succeeds with the given `value`.
-
-##### Signature
-
-```typescript
-function succeed<Value = never>(value: Value): Future<Value>
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const success = chain.of("Data Loaded")
-  .and(future.succeed)
-  .link();
-
-success.when(
-  value => console.log(value),
-  error => console.error(error)
-);
-// => Data Loaded
-```
-
-#### fail
-
-Creates a `Future` instance that immediately fails with the given `issue`.
-
-##### Signature
-
-```typescript
-function fail<Issue>(issue: Issue): Future<never, Issue | UnexpectedIssue>
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const failure = chain.of("Network Error")
-  .and(future.fail)
-  .link();
-
-failure.when(
-  value => console.log(value),
-  error => console.error(error)
-);
-// => Network Error
-```
-
-#### update
-
-Transforms the successful value of a `Future` using a `transform` function, returning a new `Future`. If the original `Future` fails, the new `Future` will also fail with the same issue.
-
-##### Signature
-
-```typescript
-function update<Value, Issue, NewValue>(transform: (value: Value) => NewValue): (future: Future<Value, Issue>) => Future<NewValue, Issue | UnexpectedIssue>
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const doubled = chain.of(10)
-  .and(future.succeed)
-  .and(future.update(value => value * 2))
-  .link();
-
-doubled.when(
-  value => console.log(value),
-  error => console.error(error)
-);
-// => 20
-```
-
-#### upgrade
-
-Transforms the successful value of a `Future` into another `Future` using an `update` function, effectively flattening nested futures. If either the original `Future` or the `update` function's `Future` fails, the resulting `Future` will fail.
-
-##### Signature
-
-```typescript
-function upgrade<Value, Issue, NewValue, NewIssue>(update: (value: Value) => Future<NewValue, NewIssue>): (future: Future<Value, Issue>) => Future<NewValue, Issue | NewIssue | UnexpectedIssue>
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const fetchData = (id: number) => future.of<string>((succeed) => {
-  setTimeout(() => succeed(`Data for ${id}`), 50);
-});
-
-const userProfile = chain.of(123)
-  .and(future.succeed)
-  .and(future.upgrade(fetchData))
-  .link();
-
-userProfile.when(
-  value => console.log(value),
-  error => console.error(error)
-);
-// => Data for 123
-```
-
-#### when
-
-Executes `success` callback if the `Future` succeeds, or `failure` callback if it fails. Returns the original `Future` (for chaining).
-
-##### Signature
-
-```typescript
-function when<Value, Issue>(success: (value: Value) => void, failure: (issue: Issue | UnexpectedIssue) => void): (future: Future<Value, Issue>) => Future<Value, Issue>
-```
-
-##### Example
-
-```typescript
-import { chain, future } from "@aminnairi/prelude";
-
-const myFuture = future.succeed("Hello");
-
-chain.of(myFuture)
-  .and(future.when(
-    value => console.log("Success:", value),
-    error => console.error("Failure:", error)
-  ));
-// => Success: Hello
-```
-
-### pattern
-
-The `pattern` module provides utility functions for working with regular expressions in a functional manner.
-
-#### test
-
-Tests whether a string matches a given regular expression pattern.
-
-##### Signature
-
-```typescript
-function test(pattern: RegExp): (input: string) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, pattern } from "@aminnairi/prelude";
-
-const hasNumber = chain.of("hello123world")
-  .and(pattern.test(/\d+/))
-  .link();
-
-console.log(hasNumber);
-// => true
-
-const hasNoNumber = chain.of("helloworld")
-  .and(pattern.test(/\d+/))
-  .link();
-
-console.log(hasNoNumber);
-// => false
-```
-
-### http
-
-The `http` module provides functions for making HTTP requests and handling responses in a functional way, utilizing the `Future` and `Maybe` modules for asynchronous operations and optional values.
-
-#### HttpError
-
-Represents an error that occurred during an HTTP request.
-
-##### Signature
-
-```typescript
-class HttpError extends Error {
-  readonly name: "HttpError";
-  constructor(error: unknown);
-}
-```
-
-##### Example
-
-```typescript
-import { chain, future, http } from "@aminnairi/prelude";
-
-chain.of("https://invalid.url")
-  .and(http.get)
-  .link()
-  .when(
-    value => console.log("Success:", value),
-    issue => {
-      if (issue instanceof http.HttpError) {
-        console.error("HTTP Error:", issue.error);
-      } else {
-        console.error("Unexpected Error:", issue);
-      }
-    }
-  );
-// => HTTP Error: ... (fetch error)
-```
-
-#### JsonError
-
-Represents an error that occurred during JSON parsing of an HTTP response.
-
-##### Signature
-
-```typescript
-class JsonError extends Error {
-  readonly name: "JsonError";
-  constructor(error: Error);
-}
-```
-
-##### Example
-
-```typescript
-import { chain, future, http } from "@aminnairi/prelude";
-
-// Assuming a response that is not valid JSON
-const invalidJsonResponse = new Response("not json", { status: 200 });
-
-chain.of(invalidJsonResponse)
-  .and(http.json)
-  .link()
-  .when(
-    value => console.log("Success:", value),
-    issue => {
-      if (issue instanceof http.JsonError) {
-        console.error("JSON Error:", issue.error.message);
-      } else {
-        console.error("Unexpected Error:", issue);
-      }
-    }
-  );
-// => JSON Error: SyntaxError: Unexpected token 'o', "not json" is not valid JSON
-```
-
-#### get
-
-Sends an HTTP GET request to the specified URL.
-
-##### Signature
-
-```typescript
-function get(url: string, options?: RequestInit): Future<Response, HttpError | future.UnexpectedIssue>
-```
-
-##### Example
-
-```typescript
-import { chain, future, http } from "@aminnairi/prelude";
-
-chain.of("https://jsonplaceholder.typicode.com/todos/1")
-  .and(http.get)
-  .link()
-  .when(
-    response => console.log("Status:", response.status),
-    issue => console.error("Error:", issue)
-  );
-// => Status: 200
-```
-
-#### json
-
-Parses the body of an HTTP Response as JSON.
-
-##### Signature
-
-```typescript
-function json(response: Response): Future<JSON, JsonError | future.UnexpectedIssue>
-```
-
-##### Example
-
-```typescript
-import { chain, future, http } from "@aminnairi/prelude";
-
-chain.of("https://jsonplaceholder.typicode.com/todos/1")
-  .and(http.get)
-  .and(future.upgrade(http.json))
-  .link()
-  .when(
-    data => console.log("Data:", data),
-    issue => console.error("Error:", issue)
-  );
-// => Data: { userId: 1, id: 1, title: 'delectus aut autem', completed: false }
-
-
-#### between
-
-Checks if a number is inclusively between a `lowerbound` and an `upperbound`.
-
-##### Signature
-
-```typescript
-function between(lowerbound: number, upperbound: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isBetween = chain.of(5)
-  .and(numeric.between(1, 10))
-  .link();
-
-console.log(isBetween);
-// => true
-
-const isNotBetween = chain.of(15)
-  .and(numeric.between(1, 10))
-  .link();
-
-console.log(isNotBetween);
-// => false
-```
-
-#### equalTo
-
-Checks if a number is equal to another number.
-
-##### Signature
-
-```typescript
-function equalTo(other: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isEqual = chain.of(5)
-  .and(numeric.equalTo(5))
-  .link();
-
-console.log(isEqual);
-// => true
-```
-
-#### differentThan
-
-Checks if a number is different from another number.
-
-##### Signature
-
-```typescript
-function differentThan(other: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isDifferent = chain.of(5)
-  .and(numeric.differentThan(10))
-  .link();
-
-console.log(isDifferent);
-// => true
-```
-
-#### greaterThan
-
-Checks if a number is greater than another number.
-
-##### Signature
-
-```typescript
-function greaterThan(other: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isGreater = chain.of(10)
-  .and(numeric.greaterThan(5))
-  .link();
-
-console.log(isGreater);
-// => true
-```
-
-#### lowerThan
-
-Checks if a number is lower than another number.
-
-##### Signature
-
-```typescript
-function lowerThan(other: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isLower = chain.of(5)
-  .and(numeric.lowerThan(10))
-  .link();
-
-console.log(isLower);
-// => true
-```
-
-#### greaterOrEqualTo
-
-Checks if a number is greater than or equal to another number.
-
-##### Signature
-
-```typescript
-function greaterOrEqualTo(other: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isGreaterOrEqual = chain.of(10)
-  .and(numeric.greaterOrEqualTo(10))
-  .link();
-
-console.log(isGreaterOrEqual);
-// => true
-```
-
-#### lowerOrEqualTo
-
-Checks if a number is lower than or equal to another number.
-
-##### Signature
-
-```typescript
-function lowerOrEqualTo(other: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isLowerOrEqual = chain.of(5)
-  .and(numeric.lowerOrEqualTo(5))
-  .link();
-
-console.log(isLowerOrEqual);
-// => true
-```
-
-#### divisibleBy
-
-Checks if a number is divisible by another number.
-
-##### Signature
-
-```typescript
-function divisibleBy(divider: number): (numeric: number) => boolean
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const isDivisible = chain.of(10)
-  .and(numeric.divisibleBy(2))
-  .link();
-
-console.log(isDivisible);
-// => true
-```
-
-#### add
-
-Adds one or more numbers to an initial number.
-
-##### Signature
-
-```typescript
-function add(...seconds: number[]): (first: number) => number
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const sum = chain.of(5)
-  .and(numeric.add(3))
-  .link();
-
-console.log(sum);
-// => 8
-```
-
-##### Example with multiple numbers
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const total = chain.of(10)
-  .and(numeric.add(1, 2, 3)) // Adds 1, 2, and 3 to 10
-  .link();
-
-console.log(total);
-// => 16
-```
-
-#### subtract
-
-Subtracts the `second` number from the `first` number.
-
-##### Signature
-
-```typescript
-function subtract(second: number): (first: number) => number
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const difference = chain.of(10)
-  .and(numeric.subtract(4))
-  .link();
-
-console.log(difference);
-// => 6
-```
-
-#### multiply
-
-Multiplies two numbers.
-
-##### Signature
-
-```typescript
-function multiply(second: number): (first: number) => number
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const product = chain.of(6)
-  .and(numeric.multiply(7))
-  .link();
-
-console.log(product);
-// => 42
-```
-
-#### divide
-
-Divides the `first` number by the `second` number. Returns a `Maybe<number>` to handle division by zero.
-
-##### Signature
-
-```typescript
-function divide(second: number): (first: number) => maybe.Maybe<number>
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const quotient = chain.of(10)
-  .and(numeric.divide(2))
-  .link();
-
-console.log(quotient.or(0));
-// => 5
-
-const divisionByZero = chain.of(10)
-  .and(numeric.divide(0))
-  .link();
-
-console.log(divisionByZero.or(0));
-// => 0
-```
-
-#### toPower
-
-Raises a number to the power of another number.
-
-##### Signature
-
-```typescript
-function toPower(power: number): (numeric: number) => number
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const result = chain.of(2)
-  .and(numeric.toPower(3))
-  .link();
-
-console.log(result);
-// => 8
-```
-
-#### maximum
-
-Returns the maximum of the given number and additional numbers.
-
-##### Signature
-
-```typescript
-function maximum(...numerics: number[]): (numeric: number) => number
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const maxNumber = chain.of(5)
-  .and(numeric.maximum(10, 2))
-  .link();
-
-console.log(maxNumber);
-// => 10
-```
-
-#### minimum
-
-Returns the minimum of the given number and additional numbers.
-
-##### Signature
-
-```typescript
-function minimum(...numerics: number[]): (numeric: number) => number
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const minNumber = chain.of(5)
-  .and(numeric.minimum(10, 2))
-  .link();
-
-console.log(minNumber);
-// => 2
-```
-
-#### compare
-
-Compares two numbers and returns a `Comparison` enum indicating whether the first is `Greater`, `Lower`, or `Equal` to the second.
-
-##### Signature
-
-```typescript
-function compare(second: number): (first: number) => Comparison
-```
-
-##### Example
-
-```typescript
-import { chain, numeric } from "@aminnairi/prelude";
-
-const comparisonResult = chain.of(10)
-  .and(numeric.compare(5))
-  .link();
-
-console.log(comparisonResult === numeric.Comparison.Greater);
-// => true
-```
-
 ### numeric
 
 The `numeric` module provides functions for performing immutable numeric operations and comparisons using a functional approach.
@@ -1989,21 +1379,11 @@ function between(lowerbound: number, upperbound: number): (numeric: number) => b
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isBetween = chain.of(5)
-  .and(numeric.between(1, 10))
-  .link();
-
+const isBetween = numeric.between(1, 10)(5);
 console.log(isBetween);
 // => true
-
-const isNotBetween = chain.of(15)
-  .and(numeric.between(1, 10))
-  .link();
-
-console.log(isNotBetween);
-// => false
 ```
 
 #### equalTo
@@ -2019,12 +1399,9 @@ function equalTo(other: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isEqual = chain.of(5)
-  .and(numeric.equalTo(5))
-  .link();
-
+const isEqual = numeric.equalTo(5)(5);
 console.log(isEqual);
 // => true
 ```
@@ -2042,12 +1419,9 @@ function differentThan(other: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isDifferent = chain.of(5)
-  .and(numeric.differentThan(10))
-  .link();
-
+const isDifferent = numeric.differentThan(10)(5);
 console.log(isDifferent);
 // => true
 ```
@@ -2065,12 +1439,9 @@ function greaterThan(other: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isGreater = chain.of(10)
-  .and(numeric.greaterThan(5))
-  .link();
-
+const isGreater = numeric.greaterThan(5)(10);
 console.log(isGreater);
 // => true
 ```
@@ -2088,12 +1459,9 @@ function lowerThan(other: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isLower = chain.of(5)
-  .and(numeric.lowerThan(10))
-  .link();
-
+const isLower = numeric.lowerThan(10)(5);
 console.log(isLower);
 // => true
 ```
@@ -2111,12 +1479,9 @@ function greaterOrEqualTo(other: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isGreaterOrEqual = chain.of(10)
-  .and(numeric.greaterOrEqualTo(10))
-  .link();
-
+const isGreaterOrEqual = numeric.greaterOrEqualTo(10)(10);
 console.log(isGreaterOrEqual);
 // => true
 ```
@@ -2134,12 +1499,9 @@ function lowerOrEqualTo(other: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isLowerOrEqual = chain.of(5)
-  .and(numeric.lowerOrEqualTo(5))
-  .link();
-
+const isLowerOrEqual = numeric.lowerOrEqualTo(5)(5);
 console.log(isLowerOrEqual);
 // => true
 ```
@@ -2157,12 +1519,9 @@ function divisibleBy(divider: number): (numeric: number) => boolean
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const isDivisible = chain.of(10)
-  .and(numeric.divisibleBy(2))
-  .link();
-
+const isDivisible = numeric.divisibleBy(2)(10);
 console.log(isDivisible);
 // => true
 ```
@@ -2180,12 +1539,9 @@ function add(...seconds: number[]): (first: number) => number
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const sum = chain.of(5)
-  .and(numeric.add(3))
-  .link();
-
+const sum = numeric.add(3)(5);
 console.log(sum);
 // => 8
 ```
@@ -2193,12 +1549,9 @@ console.log(sum);
 ##### Example with multiple numbers
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const total = chain.of(10)
-  .and(numeric.add(1, 2, 3)) // Adds 1, 2, and 3 to 10
-  .link();
-
+const total = numeric.add(1, 2, 3)(10);
 console.log(total);
 // => 16
 ```
@@ -2216,12 +1569,9 @@ function subtract(second: number): (first: number) => number
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const difference = chain.of(10)
-  .and(numeric.subtract(4))
-  .link();
-
+const difference = numeric.subtract(4)(10);
 console.log(difference);
 // => 6
 ```
@@ -2239,12 +1589,9 @@ function multiply(second: number): (first: number) => number
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const product = chain.of(6)
-  .and(numeric.multiply(7))
-  .link();
-
+const product = numeric.multiply(7)(6);
 console.log(product);
 // => 42
 ```
@@ -2262,21 +1609,13 @@ function divide(second: number): (first: number) => maybe.Maybe<number>
 ##### Example
 
 ```typescript
-import { chain, numeric, maybe } from "@aminnairi/prelude";
+import { numeric, maybe } from "@aminnairi/prelude";
 
-const quotient = chain.of(10)
-  .and(numeric.divide(2))
-  .and(maybe.or(0))
-  .link();
-
+const quotient = numeric.divide(2)(10).or(0);
 console.log(quotient);
 // => 5
 
-const divisionByZero = chain.of(10)
-  .and(numeric.divide(0))
-  .and(maybe.or(0))
-  .link();
-
+const divisionByZero = numeric.divide(0)(10).or(0);
 console.log(divisionByZero);
 // => 0
 ```
@@ -2294,12 +1633,9 @@ function toPower(power: number): (numeric: number) => number
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const result = chain.of(2)
-  .and(numeric.toPower(3))
-  .link();
-
+const result = numeric.toPower(3)(2);
 console.log(result);
 // => 8
 ```
@@ -2317,12 +1653,9 @@ function maximum(...numerics: number[]): (numeric: number) => number
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const maxNumber = chain.of(5)
-  .and(numeric.maximum(10, 2))
-  .link();
-
+const maxNumber = numeric.maximum(10, 2)(5);
 console.log(maxNumber);
 // => 10
 ```
@@ -2340,12 +1673,9 @@ function minimum(...numerics: number[]): (numeric: number) => number
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const minNumber = chain.of(5)
-  .and(numeric.minimum(10, 2))
-  .link();
-
+const minNumber = numeric.minimum(10, 2)(5);
 console.log(minNumber);
 // => 2
 ```
@@ -2363,120 +1693,352 @@ function compare(second: number): (first: number) => Comparison
 ##### Example
 
 ```typescript
-import { chain, numeric } from "@aminnairi/prelude";
+import { numeric } from "@aminnairi/prelude";
 
-const comparisonResult = chain.of(10)
-  .and(numeric.compare(5))
-  .link();
+const comparisonResult = numeric.compare(5)(10);
 
 console.log(comparisonResult === numeric.Comparison.Greater);
 // => true
+```
 
+### pattern
 
-#### not
+The `pattern` module provides utility functions for working with regular expressions in a functional manner.
 
-Returns a new function that negates the boolean result of the input `callback` function.
+#### test
+
+Tests whether a string matches a given regular expression pattern.
 
 ##### Signature
 
 ```typescript
-function not<Parameters extends Array<unknown>>(callback: (...parameters: Parameters) => boolean): (...args: Parameters) => boolean
+function test(pattern: RegExp): (input: string) => boolean
 ```
 
 ##### Example
 
 ```typescript
-import { chain, logic } from "@aminnairi/prelude";
+import { pattern } from "@aminnairi/prelude";
 
-const isEven = (num: number) => num % 2 === 0;
-const isOdd = logic.not(isEven);
-
-console.log(isOdd(5));
+const hasNumber = pattern.test(/\d+/)("hello123world");
+console.log(hasNumber);
 // => true
-console.log(isOdd(4));
-// => false
 ```
 
-#### and
+### text
 
-Returns a new function that performs a logical AND operation on the results of two input boolean-returning functions.
+The `text` module provides functions for immutable string manipulation using a functional approach.
+
+#### from
+
+Converts an unknown input to its string representation.
 
 ##### Signature
 
 ```typescript
-function and<Parameters extends Array<unknown>>(secondCallback: (...parameters: Parameters) => boolean): (firstCallback: (...parameters: Parameters) => boolean) => (...parameters: Parameters) => boolean
+function from(input: unknown): string
 ```
 
 ##### Example
 
 ```typescript
-import { chain, logic } from "@aminnairi/prelude";
+import { text } from "@aminnairi/prelude";
 
-const isEven = (num: number) => num % 2 === 0;
-const isPositive = (num: number) => num > 0;
+const numToString = text.from(123);
+console.log(numToString);
+// => "123"
+```
 
-const isEvenAndPositive = chain.of(isEven)
-  .and(logic.and(isPositive))
+#### count
+
+Returns the number of characters in a string.
+
+##### Signature
+
+```typescript
+function count(): (text: string) => number
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const textLength = text.count()("Hello World");
+console.log(textLength);
+// => 11
+```
+
+#### concatenate
+
+Concatenates a `suffix` string to the current string.
+
+##### Signature
+
+```typescript
+function concatenate(suffix: string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const greeting = text.concatenate(" World")("Hello");
+console.log(greeting);
+// => "Hello World"
+```
+
+#### updateAll
+
+Applies an `update` function to each character of a string.
+
+##### Signature
+
+```typescript
+function updateAll(update: (character: string) => string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const capitalized = text.updateAll(char => char.toUpperCase())("hello");
+console.log(capitalized);
+// => "HELLO"
+```
+
+#### updateAt
+
+Applies an `update` function to the character at a specific `index` of a string.
+
+##### Signature
+
+```typescript
+function updateAt(index: number, update: (character: string) => string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const modifiedText = text.updateAt(0, char => char.toLowerCase())("Hello");
+console.log(modifiedText);
+// => "hello"
+```
+
+#### lines
+
+Splits a string into an array of lines based on the newline character.
+
+##### Signature
+
+```typescript
+function lines(): (text: string) => Array<string>
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const multilineText = "Line 1\nLine 2\nLine 3";
+const textLines = text.lines()(multilineText);
+console.log(textLines);
+// => ["Line 1", "Line 2", "Line 3"]
+```
+
+#### split
+
+Splits a string into an array of substrings using the specified `separator`.
+
+##### Signature
+
+```typescript
+function split(separator: string): (text: string) => Array<string>
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const commaSeparated = "apple,banana,orange";
+const fruits = text.split(",")(commaSeparated);
+console.log(fruits);
+// => ["apple", "banana", "orange"]
+```
+
+#### toInteger
+
+Converts a string to an integer. Returns a `Maybe<number>` to handle invalid number strings.
+
+##### Signature
+
+```typescript
+function toInteger(): (text: string) => maybe.Maybe<number>
+```
+
+##### Example
+
+```typescript
+import { text, maybe } from "@aminnairi/prelude";
+
+const intString = "123";
+const parsedInt = text.toInteger()(intString).or(0);
+console.log(parsedInt);
+// => 123
+```
+
+#### prefix
+
+Adds a `prefix` string to the beginning of the current string.
+
+##### Signature
+
+```typescript
+function prefix(prefix: string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const prefixedText = text.prefix("Hello, ")("world");
+console.log(prefixedText);
+// => "Hello, world"
+```
+
+#### suffix
+
+Adds a `suffix` string to the end of the current string.
+
+##### Signature
+
+```typescript
+function suffix(suffix: string): (text: string) => string
+```
+
+##### Example
+
+```typescript
+import { text } from "@aminnairi/prelude";
+
+const suffixedText = text.suffix(" World!")("Hello");
+console.log(suffixedText);
+// => "Hello World!"
+```
+
+### web
+
+The `web` module provides utilities for interacting with the DOM in a functional and type-safe manner.
+
+#### getElementById
+
+Retrieves an element by its ID. It returns a `Maybe` type to safely handle cases where the element might not exist in the DOM.
+
+##### Signature
+
+```typescript
+function getElementById(id: string): maybe.Maybe<HTMLElement>
+```
+
+##### Example
+
+```typescript
+import { web } from "@aminnairi/prelude";
+
+// Assuming an element with id="existing-element" exists
+const element = web.getElementById("existing-element").or(null);
+console.log(element.id);
+// => "existing-element"
+
+const nonExistent = web.getElementById("non-existing-element").or(null);
+console.log(nonExistent);
+// => null
+```
+
+#### toggleClass
+
+Toggles a CSS class on a given DOM element. It can be used directly by providing the element, or in a curried fashion, which is useful in chains.
+
+##### Signature
+
+```typescript
+function toggleClass(className: string, element: HTMLElement): HTMLElement;
+function toggleClass(className: string): (element: HTMLElement) => HTMLElement;
+```
+
+##### Example (direct)
+
+```typescript
+import { web } from "@aminnairi/prelude";
+
+const el = document.createElement("div");
+web.toggleClass("active", el);
+console.log(el.classList.contains("active"));
+// => true
+```
+
+##### Example (curried)
+
+```typescript
+import { basic, chain, maybe, web } from "@aminnairi/prelude";
+
+const toggle = chain
+  .of(web.getElementById)
+  .and(basic.pipe(maybe.and(web.toggleClass("active"))))
   .link();
 
-console.log(isEvenAndPositive(4));
+const el = document.createElement("div");
+el.id = "my-el";
+document.body.appendChild(el);
+
+toggle("my-el");
+
+console.log(el.classList.contains("active"));
 // => true
-console.log(isEvenAndPositive(-2));
-// => false
 ```
 
-#### or
+#### on
 
-Returns a new function that performs a logical OR operation on the results of two input boolean-returning functions.
+Attaches an event listener to a DOM element. It can be used directly by providing the element, or in a curried fashion.
 
 ##### Signature
 
 ```typescript
-function or<Parameters extends Array<unknown>>(secondCallback: (...parameters: Parameters) => boolean): (firstCallback: (...parameters: Parameters) => boolean) => (...parameters: Parameters) => boolean
+function on(name: string, handler: EventListenerOrEventListenerObject, element: HTMLElement): HTMLElement;
+function on(name: string, handler: EventListenerOrEventListenerObject): (element: HTMLElement) => HTMLElement;
 ```
 
-##### Example
+##### Example (direct)
 
 ```typescript
-import { chain, logic } from "@aminnairi/prelude";
+import { web } from "@aminnairi/prelude";
 
-const isEven = (num: number) => num % 2 === 0;
-const isNegative = (num: number) => num < 0;
+const button = document.createElement("button");
+web.on("click", () => alert("clicked!"), button);
 
-const isEvenOrNegative = chain.of(isEven)
-  .and(logic.or(isNegative))
+// button.click(); // would trigger alert
+```
+
+##### Example (curried)
+
+```typescript
+import { basic, chain, maybe, web } from "@aminnairi/prelude";
+
+const setupClickListener = chain
+  .of(web.getElementById)
+  .and(basic.pipe(maybe.and(web.on("click", () => alert("Button clicked!")))))
   .link();
 
-console.log(isEvenOrNegative(3));
-// => false
-console.log(isEvenOrNegative(-5));
-// => true
-console.log(isEvenOrNegative(4));
-// => true
-```
+const button = document.createElement("button");
+button.id = "my-button";
+document.body.appendChild(button);
 
-#### pipe
-
-Returns a new function that composes two functions, where the output of the first function becomes the input of the second function.
-
-##### Signature
-
-```typescript
-function pipe<Input, Output, Value>(second: (input: Output) => Value): (first: (input: Input) => Output) => (input: Input) => Value
-```
-
-##### Example
-
-```typescript
-import { chain, logic } from "@aminnairi/prelude";
-
-const addOne = (num: number) => num + 1;
-const multiplyByTwo = (num: number) => num * 2;
-
-const addOneThenMultiplyByTwo = chain.of(addOne)
-  .and(logic.pipe(multiplyByTwo))
-  .link();
-
-console.log(addOneThenMultiplyByTwo(5));
-// => 12 ((5 + 1) * 2)
+setupClickListener("my-button");
+// button.click(); // would trigger alert
 ```
