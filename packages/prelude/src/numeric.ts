@@ -6,8 +6,6 @@ export enum Comparison {
   Equal,
 }
 
-
-
 export const between = (lowerbound: number, upperbound: number) => {
   return (numeric: number) => {
     const value = numeric;
