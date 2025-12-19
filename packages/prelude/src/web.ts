@@ -1,4 +1,5 @@
 import * as maybe from "./maybe";
+export * as attribute from "./web/attribute";
 
 export function createElement(name: string): (document: Document) => HTMLElement;
 export function createElement(name: string, document: Document): HTMLElement;
@@ -60,55 +61,6 @@ export function toggleClass(className: string, element?: HTMLElement) {
   return execute(className, element);
 }
 
-export function setAttribute(attributeName: string, attributeValue: string): (element: HTMLElement) => HTMLElement
-export function setAttribute(attributeName: string, attributeValue: string, element: HTMLElement): HTMLElement
-export function setAttribute(attributeName: string, attributeValue: string, element?: HTMLElement) {
-  const execute = (attributeName: string, attributeValue: string, element: HTMLElement): HTMLElement => {
-    element.setAttribute(attributeName, attributeValue);
-    return element;
-  };
-
-  if (typeof element === "undefined") {
-    return (element: HTMLElement): HTMLElement => {
-      return execute(attributeName, attributeValue, element);
-    };
-  }
-
-  return execute(attributeName, attributeValue, element);
-}
-
-export function getAttribute(attributeName: string): (element: HTMLElement) => string | null;
-export function getAttribute(attributeName: string, element: HTMLElement): string | null;
-export function getAttribute(attributeName: string, element?: HTMLElement) {
-  const execute = (attributeName: string, element: HTMLElement) => {
-    return element.getAttribute(attributeName);
-  };
-
-  if (typeof element === "undefined") {
-    return (element: HTMLElement) => {
-      return execute(attributeName, element);
-    };
-  }
-
-  return execute(attributeName, element);
-}
-
-export function setTextContent(content: string): (element: HTMLElement) => HTMLElement;
-export function setTextContent(content: string, element: HTMLElement): HTMLElement;
-export function setTextContent(content: string, element?: HTMLElement) {
-  const execute = (content: string, element: HTMLElement) => {
-    element.textContent = content;
-    return element;
-  };
-
-  if (typeof element === "undefined") {
-    return (element: HTMLElement) => {
-      return execute(content, element);
-    };
-  }
-
-  return execute(content, element);
-}
 
 export function appendChild(child: Node): (parent: HTMLElement) => HTMLElement;
 export function appendChild(child: Node, parent: HTMLElement): HTMLElement;
@@ -257,12 +209,4 @@ export function is<Type>(type: new () => Type, element?: HTMLElement) {
   }
 
   return execute(type, element);
-}
-
-export function getValue(element: HTMLElement) {
-  if (element instanceof HTMLInputElement) {
-    return maybe.some(element.value);
-  }
-
-  return maybe.none<string>();
 }
