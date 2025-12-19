@@ -1,5 +1,38 @@
 import * as maybe from "./maybe";
 
+export function createElement(name: string): (document: Document) => HTMLElement;
+export function createElement(name: string, document: Document): HTMLElement;
+export function createElement(name: string, document?: Document) {
+  const execute = (name: string, document: Document) => {
+    return document.createElement(name);
+  };
+
+  if (typeof document === "undefined") {
+    return (document: Document) => {
+      return execute(name, document);
+    };
+  }
+
+  return execute(name, document);
+}
+
+export function removeChild(child: Node): (parent: Element) => Element;
+export function removeChild(child: Node, parent: Element): Element;
+export function removeChild(child: Node, parent?: Element) {
+  const execute = (child: Node, parent: Element) => {
+    parent.removeChild(child);
+    return parent;
+  };
+
+  if (typeof parent === "undefined") {
+    return (parent: Element) => {
+      return execute(child, parent);
+    };
+  }
+
+  return execute(child, parent);
+}
+
 export const getElementById = (id: string) => {
   const element = document.getElementById(id);
 
@@ -44,11 +77,37 @@ export function setAttribute(attributeName: string, attributeValue: string, elem
   return execute(attributeName, attributeValue, element);
 }
 
+export function getAttribute(attributeName: string): (element: HTMLElement) => string | null;
 export function getAttribute(attributeName: string, element: HTMLElement): string | null;
 export function getAttribute(attributeName: string, element?: HTMLElement) {
   const execute = (attributeName: string, element: HTMLElement) => {
     return element.getAttribute(attributeName);
   };
+
+  if (typeof element === "undefined") {
+    return (element: HTMLElement) => {
+      return execute(attributeName, element);
+    };
+  }
+
+  return execute(attributeName, element);
+}
+
+export function setTextContent(content: string): (element: HTMLElement) => HTMLElement;
+export function setTextContent(content: string, element: HTMLElement): HTMLElement;
+export function setTextContent(content: string, element?: HTMLElement) {
+  const execute = (content: string, element: HTMLElement) => {
+    element.textContent = content;
+    return element;
+  };
+
+  if (typeof element === "undefined") {
+    return (element: HTMLElement) => {
+      return execute(content, element);
+    };
+  }
+
+  return execute(content, element);
 }
 
 export function appendChild(child: Node): (parent: HTMLElement) => HTMLElement;
@@ -171,4 +230,39 @@ export function on(name: string, handler: EventListenerOrEventListenerObject, el
   }
 
   return execute(name, handler, element);
+}
+
+export function preventDefault(handler: EventListener) {
+  return (event: Event) => {
+    event.preventDefault();
+    handler(event);
+  };
+}
+
+export function is<Type>(type: new () => Type): (element: HTMLElement) => maybe.Maybe<Type>;
+export function is<Type>(type: new () => Type, element: HTMLElement): maybe.Maybe<Type>;
+export function is<Type>(type: new () => Type, element?: HTMLElement) {
+  const execute = (type: new () => Type, element: HTMLElement) => {
+    if (element instanceof type) {
+      return maybe.some(element);
+    }
+
+    return maybe.none();
+  };
+
+  if (typeof element === "undefined") {
+    return (element: HTMLElement) => {
+      return execute(type, element);
+    };
+  }
+
+  return execute(type, element);
+}
+
+export function getValue(element: HTMLElement) {
+  if (element instanceof HTMLInputElement) {
+    return maybe.some(element.value);
+  }
+
+  return maybe.none<string>();
 }
