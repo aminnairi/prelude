@@ -1,5 +1,7 @@
 import * as maybe from "./maybe";
 export * as attribute from "./web/attribute";
+export * as property from "./web/property";
+export * as element from "./web/element";
 
 export function createElement(name: string): (document: Document) => HTMLElement;
 export function createElement(name: string, document: Document): HTMLElement;
@@ -62,16 +64,16 @@ export function toggleClass(className: string, element?: HTMLElement) {
 }
 
 
-export function appendChild(child: Node): (parent: HTMLElement) => HTMLElement;
-export function appendChild(child: Node, parent: HTMLElement): HTMLElement;
-export function appendChild(child: Node, parent?: HTMLElement) {
-  const execute = (child: Node, parent: HTMLElement) => {
+export function appendChild(child: Node): <Parent extends HTMLElement>(parent: Parent) => Parent;
+export function appendChild<Parent extends HTMLElement>(child: Node, parent: Parent): Parent;
+export function appendChild<Parent extends HTMLElement>(child: Node, parent?: Parent) {
+  const execute = (child: Node, parent: Parent) => {
     parent.appendChild(child);
     return parent;
   };
 
   if (typeof parent === "undefined") {
-    return (parent: HTMLElement) => {
+    return (parent: Parent) => {
       return execute(child, parent);
     };
   }
@@ -209,4 +211,9 @@ export function is<Type>(type: new () => Type, element?: HTMLElement) {
   }
 
   return execute(type, element);
+}
+
+export function reset(element: HTMLFormElement) {
+  element.reset();
+  return element;
 }
