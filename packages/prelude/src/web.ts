@@ -2,6 +2,7 @@ import * as maybe from "./maybe";
 export * as attribute from "./web/attribute";
 export * as property from "./web/property";
 export * as element from "./web/element";
+export * as api from "./web/api";
 
 export function createElement(name: string): (document: Document) => HTMLElement;
 export function createElement(name: string, document: Document): HTMLElement;
