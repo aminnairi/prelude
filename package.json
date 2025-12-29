@@ -3,6 +3,7 @@
   "workspaces": [
     "example",
     "packages/prelude",
-    "apps/web"
+    "apps/web",
+    "apps/webos"
   ]
 }
