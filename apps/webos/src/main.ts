@@ -1,7 +1,8 @@
+import type { battery } from "@aminnairi/prelude/src/web/api";
 import "./style.css";
-import { chain, maybe, web } from "@aminnairi/prelude"
+import { chain, maybe, result, web } from "@aminnairi/prelude"
 
-const networkElement = chain
+const networkIconElement = chain
   .of(document)
   .and(web.createElement("img"))
   .and(web.attribute.set("src", "/network.png"))
@@ -9,6 +10,67 @@ const networkElement = chain
   .and(web.attribute.set("width", "16px"))
   .and(web.attribute.set("height", "16px"))
   .link();
+
+const networkTextElement = chain
+  .of(document)
+  .and(web.createElement("span"))
+  .link();
+
+const networkElement = chain
+  .of(document)
+  .and(web.createElement("div"))
+  .and(web.attribute.set("style", "display: flex; flex-direction: row; gap: 5px"))
+  .and(web.appendChild(networkIconElement))
+  .and(web.appendChild(networkTextElement))
+  .link();
+
+const updateNetworkBandwidth = (element: HTMLElement, network: web.api.network.Network) => {
+  chain
+    .of(element)
+    .and(web.property.textContent.set(`${network.downlink} Mb/s`))
+}
+
+const updateNetworkType = (element: HTMLElement, network: web.api.network.Network) => {
+  switch (network.effectiveType) {
+    case web.api.network.EffectiveType.VerySlow:
+      chain
+        .of(element)
+        .and(web.attribute.set("src", "/network-very-slow.svg"))
+      break;
+
+    case web.api.network.EffectiveType.Slow:
+      chain
+        .of(element)
+        .and(web.attribute.set("src", "/network-slow.svg"))
+      break;
+
+    case web.api.network.EffectiveType.Fast:
+      chain
+        .of(element)
+        .and(web.attribute.set("src", "/network-medium.svg"))
+      break;
+
+    default:
+      chain
+        .of(element)
+        .and(web.attribute.set("src", "/network-high.svg"))
+  }
+}
+
+web.api.network.request().when(
+  network => {
+    updateNetworkBandwidth(networkTextElement, network);
+    updateNetworkType(networkIconElement, network);
+
+    network.addEventListener("change", () => {
+      updateNetworkBandwidth(networkTextElement, network);
+      updateNetworkType(networkIconElement, network);
+    })
+  },
+  error => {
+    console.error(error);
+  },
+);
 
 const batteryIconElement = chain
   .of(document)
@@ -22,8 +84,73 @@ const batteryIconElement = chain
 const batteryTextElement = chain
   .of(document)
   .and(web.createElement("span"))
-  .and(web.property.textContent.set("80%"))
+  .and(web.property.textContent.set(""))
   .link();
+
+const updateBattery = (element: HTMLElement, battery: web.api.battery.Battery) => {
+  const level = Math.floor(battery.level * 100);
+
+  chain
+    .of(element)
+    .and(web.property.textContent.set(level + "%"))
+
+  if (battery.charging) {
+    chain
+      .of(batteryIconElement)
+      .and(web.attribute.set("src", "/charging.svg"))
+  } else if (level < 25) {
+    chain
+      .of(batteryIconElement)
+      .and(web.attribute.set("src", "/charging-0.svg"))
+  } else if (level < 50) {
+    chain
+      .of(batteryIconElement)
+      .and(web.attribute.set("src", "/battery-25.svg"))
+  } else if (level < 75) {
+    chain
+      .of(batteryIconElement)
+      .and(web.attribute.set("src", "/battery-50.svg"))
+  } else if (level < 100) {
+    chain
+      .of(batteryIconElement)
+      .and(web.attribute.set("src", "/battery-75.svg"))
+  } else {
+    chain
+      .of(batteryIconElement)
+      .and(web.attribute.set("src", "/battery-100.svg"))
+  }
+}
+
+web.api.battery.request().then(maybeBattery => {
+  chain
+    .of(maybeBattery)
+    .and(result.when(
+      battery => {
+        updateBattery(batteryTextElement, battery);
+
+        battery.addEventListener("levelchange", () => {
+          updateBattery(batteryTextElement, battery);
+        })
+
+        battery.addEventListener("chargingchange", () => {
+          updateBattery(batteryTextElement, battery);
+        })
+      },
+      error => {
+        console.error(error);
+        updateBattery(batteryTextElement, {
+          addEventListener() { },
+          dispatchEvent(event) {
+            return false
+          },
+          removeEventListener(type, callback) { },
+
+          charging: false,
+          level: 0
+        })
+      }
+    ))
+})
 
 const batteryElement = chain
   .of(document)
@@ -42,16 +169,27 @@ const vibrationElement = chain
   .and(web.attribute.set("height", "16px"))
   .link();
 
-const now = new Date();
-const date = now.toLocaleDateString("fr-FR");
-const time = now.toLocaleTimeString("fr-FR");
+const updateDate = (element: HTMLElement) => {
+  const now = new Date();
+  const date = now.toLocaleDateString("fr-FR");
+  const time = now.toLocaleTimeString("fr-FR");
+
+  chain
+    .of(element)
+    .and(web.property.textContent.set(`${date} ${time}`))
+}
 
 const dateElement = chain
   .of(document)
   .and(web.createElement("div"))
-  .and(web.property.textContent.set(`${date} ${time}`))
   .and(web.attribute.set("style", "flex: 1; display: flex; justify-content: center; alignItems: center"))
   .link();
+
+updateDate(dateElement);
+
+setInterval(() => {
+  updateDate(dateElement);
+}, 1000);
 
 const headerElement = chain
   .of(document)
